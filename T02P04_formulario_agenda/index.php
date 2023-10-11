@@ -42,6 +42,8 @@
                 $agenda = array();
             }
 
+            // Si el campo "name" existe y no está vacío, guardar su valor en $name.
+            // De lo contrario, dar un aviso al usuario para que introduzca su nombre.
             // print_r($agenda);
             if (isset($_POST['name']) && !empty($_POST['name'])) {
                 $name = filter_input(INPUT_POST, 'name');
@@ -49,6 +51,10 @@
                 echo "<p class='warning'>¡Introduce un nombre!</p>";
             }
 
+            // Si el campo "phone" existe y no está vacío, guardar su valor en $name.
+            // Si el campo "phone" está vacío, pero el campo "name" no:
+            //      Si el campo "agenda" existe, borrar el contacto que coincida con el valor del campo "name".
+            //      De lo contrario, dar un aviso al usuario diciendo que el contacto no existe.
             if (isset($_POST['phone']) && !empty($_POST['phone'])) {
                 $phone = filter_input(INPUT_POST, 'phone');
             } elseif ((isset($_POST['phone']) && empty($_POST['phone'])) && (isset($_POST['name']) && !empty($_POST['name']))) {
@@ -62,6 +68,7 @@
             //     echo "<p style='color: red;'>Introduce un telefono!</p>";
             // }
 
+            // Si ambos campos existen al enviar el formulario, añadir los datos a $agenda.
             if (isset($name) && isset($phone)) {
                 $agenda[$name] = $phone;
             }
@@ -76,6 +83,7 @@
             <label for="phone">Introduzca su teléfono:</label>
             <input type="number" id="phone" name="phone">
             <?php
+                // Envía los datos de cada contacto en un campo oculto llamado "agenda".
                 foreach ($agenda as $nombre => $telefono) {
                     echo "<input type='hidden' name='agenda[" . $nombre . "]' value='" . $telefono . "'/>";
                 }
@@ -86,6 +94,7 @@
         <br>
         <h2>Agenda</h2>
         <?php
+            // Muestra los contactos existentes en la agenda.
             if(empty($agenda)) {
                 echo "No hay contactos registrados.";
             } else {
