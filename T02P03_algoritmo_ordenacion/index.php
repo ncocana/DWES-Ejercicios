@@ -67,5 +67,7 @@
                 echo $value . "<br>";
             }
         ?>
+        <br>
+        <a href="./algoritmo_insercion.php">Ordenación por Inserción</a>
     </body>
 </html>
