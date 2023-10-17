@@ -3,3 +3,5 @@
 
 # Other files
 laravel-trial
+*.zip
+*.rar
