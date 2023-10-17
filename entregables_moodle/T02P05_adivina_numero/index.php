@@ -17,6 +17,22 @@
 </html>
 
 <?php
+    /**
+     * Procesa el formulario de adivinanza de números y controla el juego.
+     *
+     * Esta función procesa los datos del formulario, gestiona el juego,
+     * y muestra los mensajes correspondientes.
+     * Si $submitButton existe y $numberToGuess no es nulo:
+     *      Si $numberGuessed es igual a $numberToGuess, muestra el mensaje de éxito.
+     *      Si $numAttempts es 0, muestra el mensaje de fracaso.
+     *      Si $numberGuessed no es nulo:
+     *          Si el valor $numberGuessed es menor o mayor a el valor de $numberToGuess,
+     *          muestra el formulario y un mensaje con los intentos restantes
+     *          y si el número adivinado es mayor o menor al número a adivinar.
+     * De lo contrario, muestra el formulario del juego.
+     *
+     * @return void
+     */
     function processForm() {
         $submitButton = isset($_POST["submitButton"]);
         $numberToGuess = isset($_POST["numberToGuess"])? filter_input(INPUT_POST, 'numberToGuess') : null;
@@ -42,6 +58,17 @@
         }
     }
 
+    /**
+     * Muestra el formulario para adivinar el número.
+     *
+     * Esta función muestra el formulario para que el usuario
+     * adivine el número, y establece las reglas del juego.
+     *
+     * @param int $numberToGuess El número que el usuario debe adivinar.
+     * @param int $numAttempts El número de intentos disponibles (por defecto es el máximo permitido).
+     *
+     * @return void
+     */
     function displayForm($numberToGuess, $numAttempts = MAX_ATTEMPTS) {
         ?>
         <h1>¡Adivina el número!</h1>
@@ -60,15 +87,48 @@
         <?php
     }
 
+    /**
+     * Agrega los campos ocultos llamados "numAttempts" y "numberToGuess" al formulario.
+     *
+     * Esta función agrega campos ocultos al formulario para almacenar el número a adivinar
+     * y el número de intentos restantes.
+     *
+     * @param int $numberToGuess El número que el usuario debe adivinar.
+     * @param int $numAttempts El número de intentos disponibles.
+     *
+     * @return void
+     */
     function addHiddenFields($numberToGuess, $numAttempts) {
         echo "<input type='hidden' id='numAttempts' name='numAttempts' value='" . $numAttempts . "'/>";
         echo "<input type='hidden' id='numberToGuess' name='numberToGuess' value='" . $numberToGuess . "'/>";
     }
 
+    /**
+     * Muestra un mensaje que indica el número de intentos restantes.
+     *
+     * Esta función muestra un mensaje que informa al usuario sobre el número de intentos restantes
+     * y si su suposición fue demasiado alta o baja.
+     *
+     * @param int $numAttempts El número de intentos restantes.
+     * @param int $numberGuessed El número adivinado por el usuario.
+     * @param string $difference Indica si el número adivinado es más "alto" o "bajo" que el número correcto.
+     *
+     * @return void
+     */
     function printRemainingAttempts($numAttempts, $numberGuessed, $difference) {
         echo "<p>¡Ups! El número " . $numberGuessed . " es demasiado " . $difference . ". Te quedan " . $numAttempts . " intentos.</p>";
     }
 
+    /**
+     * Muestra un mensaje de fracaso en el juego.
+     *
+     * Esta función muestra un mensaje cuando el usuario se queda sin intentos y no adivina el número,
+     * mostrando el número correcto, y permite iniciar otra partida.
+     *
+     * @param int $numberToGuess El número que el usuario debía adivinar.
+     *
+     * @return void
+     */
     function displayFailure($numberToGuess) {
         ?>
         <p>¡Oh no! Te has quedado sin intentos. El número era <?php echo $numberToGuess; ?>.</p>
@@ -78,6 +138,18 @@
         <?php
     }
 
+    /**
+     * Muestra un mensaje de éxito en el juego.
+     *
+     * Esta función muestra un mensaje cuando el usuario adivina el número con éxito,
+     * junto al número de intentos que tardó en adivinarlo,
+     * y permite iniciar otra partida.
+     *
+     * @param int $numberToGuess El número que el usuario debía adivinar.
+     * @param int $numAttempts El número de intentos utilizados.
+     *
+     * @return void
+     */
     function displaySuccess($numberToGuess, $numAttempts) {
         ?>
         <p>¡Felicidades! ¡Has acertado en tu intento número <?php echo (MAX_ATTEMPTS - $numAttempts); ?>! El número era <?php echo $numberToGuess; ?>.</p>
