@@ -18,24 +18,17 @@
 
 <?php
     function processForm() {
-        if (isset($_POST["submitButton"]) && isset($_POST["numberToGuess"])) {
-            if (isset($_POST['numAttempts'])) {
-                $numAttempts = filter_input(INPUT_POST, 'numAttempts') - 1;
-            }
+        $submitButton = isset($_POST["submitButton"]);
+        $numberToGuess = isset($_POST["numberToGuess"])? filter_input(INPUT_POST, 'numberToGuess') : null;
+        $numAttempts = isset($_POST['numAttempts'])? (int) filter_input(INPUT_POST, 'numAttempts') - 1 : null;
+        $numberGuessed = isset($_POST['numberGuessed'])? filter_input(INPUT_POST, 'numberGuessed') : null;
 
-            if (isset($_POST['numberToGuess'])) {
-                $numberToGuess = filter_input(INPUT_POST, 'numberToGuess');
-            }
-
-            if (isset($_POST['numberGuessed'])) {
-                $numberGuessed = filter_input(INPUT_POST, 'numberGuessed');
-            }
-
+        if ($submitButton && $numberToGuess !== null) {
             if ($numberGuessed == $numberToGuess) {
                 displaySuccess($numberToGuess, $numAttempts);
-            } elseif ($numAttempts == 0) {
+            } elseif ($numAttempts === 0) {
                 displayFailure($numberToGuess);
-            } elseif ($numberGuessed != $numberToGuess) {
+            } elseif ($numberGuessed !== null) {
                 if ($numberGuessed < $numberToGuess) {
                     displayForm($numberToGuess, $numAttempts);
                     printRemainingAttempts($numAttempts, $numberGuessed, "bajo");
@@ -57,7 +50,7 @@
         <p>2. Tienes un máximo de <?php echo MAX_ATTEMPTS; ?> intentos.</p>
         <form method="POST">
             <label for="number">Creo que es el número...</label>
-            <input type="number" id="numberGuessed" name="numberGuessed" autofocus required min="<?php echo MIN_NUM; ?>" max="<?php echo MAX_NUM; ?>" style="width: 3em;" />
+            <input type="number" id="numberGuessed" name="numberGuessed" required min="<?php echo MIN_NUM; ?>" max="<?php echo MAX_NUM; ?>" style="width: 3em;" />
             <?php
                 // Añade los campos ocultos "numAttempts" y "numberToGuess".
                 addHiddenFields($numberToGuess, $numAttempts);
