@@ -35,9 +35,9 @@
      */
     function processForm() {
         $submitButton = isset($_POST["submitButton"]);
-        $numberToGuess = isset($_POST["numberToGuess"])? filter_input(INPUT_POST, 'numberToGuess') : null;
-        $numAttempts = isset($_POST['numAttempts'])? (int) filter_input(INPUT_POST, 'numAttempts') - 1 : null;
-        $numberGuessed = isset($_POST['numberGuessed'])? filter_input(INPUT_POST, 'numberGuessed') : null;
+        $numberToGuess = isset($_POST["numberToGuess"])? (int) filter_input(INPUT_POST, 'numberToGuess', FILTER_VALIDATE_INT) : null;
+        $numAttempts = isset($_POST['numAttempts'])? (int) filter_input(INPUT_POST, 'numAttempts', FILTER_VALIDATE_INT) - 1 : null;
+        $numberGuessed = isset($_POST['numberGuessed'])? (int) filter_input(INPUT_POST, 'numberGuessed', FILTER_VALIDATE_INT) : null;
 
         if ($submitButton && $numberToGuess !== null) {
             if ($numberGuessed == $numberToGuess) {
