@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
     <head>
-        <title>Práctica 6 | Cookies</title>
+        <title>Práctica 1 | Cookies</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="initial-scale=1, width=device-width">
     </head>
