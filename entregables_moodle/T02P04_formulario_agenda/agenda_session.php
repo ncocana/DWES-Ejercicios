@@ -38,7 +38,7 @@
             $agenda = processForm();
         ?>
         <h1>Nuevo contacto</h1>
-        <form action="agenda.php" method="POST">
+        <form action="agenda_session.php" method="POST">
             <label for="name">Introduzca su nombre:</label>
             <input type="text" id="name" name="name" required>
             <br>
@@ -49,7 +49,7 @@
                 // addFieldAgenda($agenda);
             ?>
             <br>
-            <input type="submit" value="Enviar">
+            <input type="submit" name="submit" value="Enviar">
         </form>
         <br>
         <h2>Agenda</h2>
