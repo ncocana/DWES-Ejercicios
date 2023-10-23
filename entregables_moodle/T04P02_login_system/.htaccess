@@ -3,7 +3,7 @@ Options -Multiviews
 # Mod Rewrite
 Options +FollowSymLinks
 RewriteEngine On
-RewriteBase /php-login-script-level-1/
+RewriteBase /T04P02_login_system/
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 # used for php pages such as "yoursite.com/login.php" will become "yoursite.com/login/"
