@@ -28,7 +28,8 @@ class User{
         $query = "SELECT id, firstname, lastname, access_level, password, status
                 FROM " . $this->table_name . "
                 WHERE email = ?
-                LIMIT 0,1";
+                OFFSET 0
+                LIMIT 1";
         // prepare the query
         $stmt = $this->conn->prepare( $query );
         // sanitize
