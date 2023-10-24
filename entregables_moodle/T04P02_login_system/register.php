@@ -29,7 +29,24 @@ if($_POST){
         echo "</div>";
     }
     else{
-        // create user will be here
+        // set values to object properties
+        $user->firstname=$_POST['firstname'];
+        $user->lastname=$_POST['lastname'];
+        $user->contact_number=$_POST['contact_number'];
+        $user->address=$_POST['address'];
+        $user->password=$_POST['password'];
+        $user->access_level='Customer';
+        $user->status=1;
+        // create the user
+        if($user->create()){
+            echo "<div class='alert alert-info'>";
+                echo "Successfully registered. <a href='{$home_url}login'>Please login</a>.";
+            echo "</div>";
+            // empty posted values
+            $_POST=array();
+        }else{
+            echo "<div class='alert alert-danger' role='alert'>Unable to register. Please try again.</div>";
+        }
     }
 }
 ?>
