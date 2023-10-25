@@ -131,5 +131,19 @@ class User{
         // return values
         return $stmt;
     }
+
+    // used for paging users
+    public function countAll(){
+        // query to select all user records
+        $query = "SELECT id FROM " . $this->table_name . "";
+        // prepare query statement
+        $stmt = $this->conn->prepare($query);
+        // execute query
+        $stmt->execute();
+        // get number of rows
+        $num = $stmt->rowCount();
+        // return row count
+        return $num;
+    }
 }
 ?>
