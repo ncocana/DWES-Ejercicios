@@ -120,7 +120,8 @@ class User{
                     created
                 FROM " . $this->table_name . "
                 ORDER BY id DESC
-                LIMIT ?, ?";
+                OFFSET ?
+                LIMIT ?";
         // prepare query statement
         $stmt = $this->conn->prepare( $query );
         // bind limit clause variables
