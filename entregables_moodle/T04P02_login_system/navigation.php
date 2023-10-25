@@ -43,12 +43,12 @@
                     ?>
                     <ul class="nav navbar-nav navbar-right">
                         <li <?php echo $page_title=="Login" ? "class='active'" : ""; ?>>
-                            <a href="<?php echo $home_url; ?>login">
+                            <a href="<?php echo $home_url; ?>login.php">
                                 <span class="glyphicon glyphicon-log-in"></span> Log In
                             </a>
                         </li>
                         <li <?php echo $page_title=="Register" ? "class='active'" : ""; ?>>
-                            <a href="<?php echo $home_url; ?>register">
+                            <a href="<?php echo $home_url; ?>register.php">
                                 <span class="glyphicon glyphicon-check"></span> Register
                             </a>
                         </li>
