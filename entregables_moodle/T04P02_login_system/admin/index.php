@@ -10,6 +10,12 @@ include 'layout_head.php';
     echo "<div class='col-md-12'>";
         // get parameter values, and to prevent undefined index notice
         $action = isset($_GET['action']) ? $_GET['action'] : "";
+        // if login was successful
+        if($action=='login_success'){
+            echo "<div class='alert alert-success'>";
+                echo "<strong>Welcome back admin " . $_SESSION['firstname'] . "!</strong>";
+            echo "</div>";
+        }
         // tell the user he's already logged in
         if($action=='already_logged_in'){
             echo "<div class='alert alert-info'>";
