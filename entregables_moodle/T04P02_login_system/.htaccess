@@ -7,7 +7,7 @@ Options -Multiviews
 Options +FollowSymLinks
 RewriteEngine On
 # RewriteBase path must be the path starting from "localhost".
-# In this case is the complete path is: "http://localhost/dwes/entregables_moodle/T04P02_login_system/login",
+# In this case, the complete path is: "http://localhost/dwes/entregables_moodle/T04P02_login_system/login",
 # but the file .htaccess is inside the "./T04P02_login_system/" directory.
 RewriteBase /dwes/entregables_moodle/T04P02_login_system/
 RewriteCond %{REQUEST_FILENAME} !-f
