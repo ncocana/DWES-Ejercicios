@@ -1,9 +1,15 @@
+# Must have the php module "mod_rewrite" uncommented in "php.ini",
+# and "AllowOverride All" configurated in "httpd.conf".
+
 #Fix Rewrite
 Options -Multiviews
 # Mod Rewrite
 Options +FollowSymLinks
 RewriteEngine On
-RewriteBase /T04P02_login_system/
+# RewriteBase path must be the path starting from "localhost".
+# In this case is the complete path is: "http://localhost/dwes/entregables_moodle/T04P02_login_system/login",
+# but the file .htaccess is inside the "./T04P02_login_system/" directory.
+RewriteBase /dwes/entregables_moodle/T04P02_login_system/
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 # used for php pages such as "yoursite.com/login.php" will become "yoursite.com/login/"
