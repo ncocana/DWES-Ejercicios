@@ -24,7 +24,18 @@ echo "<div class='col-sm-12'>";
         die('Access code not found.');
     }
     else{
-        // post code will be here
+        // if form was posted
+        if($_POST){
+            // set values to object properties
+            $user->password=$_POST['password'];
+            // reset password
+            if($user->updatePassword()){
+                echo "<div class='alert alert-info'>Password was reset. Please <a href='{$home_url}login'>login.</a></div>";
+            }
+            else{
+                echo "<div class='alert alert-danger'>Unable to reset password.</div>";
+            }
+        }
         echo "<form action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "?access_code={$access_code}' method='post'>
         <table class='table table-hover table-responsive table-bordered'>
             <tr>
