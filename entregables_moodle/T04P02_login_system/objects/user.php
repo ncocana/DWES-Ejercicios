@@ -173,5 +173,26 @@ class User{
         // return false if access_code does not exist in the database
         return false;
     }
+
+    // used in email verification feature
+    function updateStatusByAccessCode(){
+        // update query
+        $query = "UPDATE " . $this->table_name . "
+                SET status = :status
+                WHERE access_code = :access_code";
+        // prepare the query
+        $stmt = $this->conn->prepare($query);
+        // sanitize
+        $this->status=htmlspecialchars(strip_tags($this->status));
+        $this->access_code=htmlspecialchars(strip_tags($this->access_code));
+        // bind the values from the form
+        $stmt->bindParam(':status', $this->status);
+        $stmt->bindParam(':access_code', $this->access_code);
+        // execute the query
+        if($stmt->execute()){
+            return true;
+        }
+        return false;
+    }
 }
 ?>
