@@ -23,5 +23,18 @@ class Utils{
         } while ($rnd >= $range);
         return $min + $rnd;
     }
+
+    // send email using built in php mail function
+    public function sendEmailViaPhpMail($send_to_email, $subject, $body){
+        $from_name="Noa";
+        $from_email="ncocana@cifpfbmoll.eu";
+        $headers  = "MIME-Version: 1.0\r\n";
+        $headers .= "Content-type: text/html; charset=iso-8859-1\r\n";
+        $headers .= "From: {$from_name} <{$from_email}> \n";
+        if(mail($send_to_email, $subject, $body, $headers)){
+            return true;
+        }
+        return false;
+    }
 }
 ?>
