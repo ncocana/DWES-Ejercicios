@@ -36,7 +36,7 @@ if($_POST){
         $user->address=$_POST['address'];
         $user->password=$_POST['password'];
         $user->access_level='Customer';
-        $user->status=1;
+        $user->status=0;
         // create the user
         if($user->create()){
             echo "<div class='alert alert-info'>";
