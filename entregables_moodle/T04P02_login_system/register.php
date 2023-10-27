@@ -37,6 +37,9 @@ if($_POST){
         $user->password=$_POST['password'];
         $user->access_level='Customer';
         $user->status=0;
+        // access code for email verification
+        $access_code=$utils->getToken();
+        $user->access_code=$access_code;
         // create the user
         if($user->create()){
             echo "<div class='alert alert-info'>";
