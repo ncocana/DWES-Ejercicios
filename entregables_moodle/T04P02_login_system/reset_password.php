@@ -16,7 +16,16 @@ $user = new User($db);
 // include page header HTML
 include_once "layout_head.php";
 echo "<div class='col-sm-12'>";
-    // check acess code will be here
+    // get given access code
+    $access_code=isset($_GET['access_code']) ? $_GET['access_code'] : die("Access code not found.");
+    // check if access code exists
+    $user->access_code=$access_code;
+    if(!$user->accessCodeExists()){
+        die('Access code not found.');
+    }
+    else{
+        // reset password form will be here
+    }
 echo "</div>";
 // include page footer HTML
 include_once "layout_foot.php";
