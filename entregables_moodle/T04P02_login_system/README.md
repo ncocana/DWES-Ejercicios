@@ -9,6 +9,6 @@
 
 Práctica en PHP consistente en crear un sistema de login con una base de datos en PostgreSQL, validación de email, y reseteo de contraseña.   
 
-El link de la aplicación en remoto es: [ncocana_login.randion.es](ncocana_login.randion.es).
+El link de la aplicación en remoto es: [ncocana_login.randion.es](http://ncocana_login.randion.es/).
 
 ![Index](./docs/index.png)
