@@ -6,10 +6,17 @@ Options -Multiviews
 # Mod Rewrite
 Options +FollowSymLinks
 RewriteEngine On
+
 # RewriteBase path must be the path starting from "localhost".
 # In this case, the complete path is: "http://localhost/dwes/ejercicios-1ra-eva-ncocana/entregables_moodle/T04P02_login_system/login",
 # but the file .htaccess is inside the "./T04P02_login_system/" directory.
-RewriteBase /dwes/ejercicios-1ra-eva-ncocana/entregables_moodle/T04P02_login_system/
+
+# For localhost and randion.
+# RewriteBase /dwes/ejercicios-1ra-eva-ncocana/entregables_moodle/T04P02_login_system/
+
+# For virtualhost ncocana_login.randion.es
+RewriteBase /
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 # used for php pages such as "yoursite.com/login.php" will become "yoursite.com/login/"
