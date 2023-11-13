@@ -8,6 +8,8 @@ date_default_timezone_set('Europe/Madrid');
 // Determine the current domain
 if ($_SERVER['HTTP_HOST'] === 'ncocana.randion.es') {
     $domain = "ncocana.randion.es";
+} else if ($_SERVER['HTTP_HOST'] === 'ncocana_login.randion.es') {
+    $domain = "ncocana_login.randion.es";
 } else {
     // Default URL for unknown domains and localhost
     $domain = "localhost";
