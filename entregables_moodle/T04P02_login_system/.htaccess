@@ -15,7 +15,7 @@ RewriteEngine On
 # RewriteBase /dwes/ejercicios-1ra-eva-ncocana/entregables_moodle/T04P02_login_system/
 
 # For virtualhost ncocana_login.randion.es
-RewriteBase /
+# RewriteBase /
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
