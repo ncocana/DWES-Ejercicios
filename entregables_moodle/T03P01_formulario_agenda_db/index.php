@@ -74,6 +74,8 @@
                     // Si $phone es null, borra el contacto si existe.
                     if (contactExists($pdo, $name, $surname)) {
                         deleteContact($pdo, $name, $surname);
+                    } else {
+                        echo "<p class='warning'>Este contacto no existe.</p>";
                     }
                 }
             }
