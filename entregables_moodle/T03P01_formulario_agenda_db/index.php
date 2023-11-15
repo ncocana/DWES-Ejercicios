@@ -121,8 +121,14 @@
      */
     function getConnection() {
         include_once "./database.php";
-        $database = new Database();
-        return $database->getConnection();
+        
+        try {
+            $database = new Database();
+            return $database->getConnection();
+        } catch (PDOException $e) {
+            // Handle the exception here, you can log it or take appropriate action
+            echo "<p class='warning'>Error updating contact: " . $e->getMessage() . "</p>";
+        }
     }
 
     /**
@@ -134,7 +140,12 @@
      *                              o falso en caso de error.
      */
     function getContacts($pdo) {
-        return $pdo->query('SELECT * FROM contacts');
+        try {
+            return $pdo->query('SELECT * FROM contacts');
+        } catch (PDOException $e) {
+            // Handle the exception here, you can log it or take appropriate action
+            echo "<p class='warning'>Error updating contact: " . $e->getMessage() . "</p>";
+        }
     }
 
     /**
@@ -147,13 +158,18 @@
      * @return bool Verdadero si el contacto existe, falso en caso contrario.
      */
     function contactExists($pdo, $name, $surname) {
-        $statement = $pdo->prepare('SELECT * FROM contacts
-                            WHERE name = :name AND surname = :surname');
-        $statement->bindParam(':name', $name, PDO::PARAM_STR);
-        $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
-        $statement->execute();
+        try {
+            $statement = $pdo->prepare('SELECT * FROM contacts
+                                WHERE name = :name AND surname = :surname');
+            $statement->bindParam(':name', $name, PDO::PARAM_STR);
+            $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
+            $statement->execute();
 
-        return $statement->rowCount() >= 1;
+            return $statement->rowCount() >= 1;
+        } catch (PDOException $e) {
+            // Handle the exception here, you can log it or take appropriate action
+            echo "<p class='warning'>Error updating contact: " . $e->getMessage() . "</p>";
+        }
     }
 
     /**
@@ -167,10 +183,15 @@
      * @return void
      */
     function insertContact($pdo, $name, $surname, $phone_number) {
-        $sql = 'INSERT INTO contacts(name, surname, phone_number)
-                values(:name, :surname, :phone_number)';
-        $statement = $pdo->prepare($sql);
-        $statement->execute(['name' => $name, 'surname' => $surname, 'phone_number' => $phone_number]);
+        try {
+            $sql = 'INSERT INTO contacts(name, surname, phone_number)
+                    values(:name, :surname, :phone_number)';
+            $statement = $pdo->prepare($sql);
+            $statement->execute(['name' => $name, 'surname' => $surname, 'phone_number' => $phone_number]);
+        } catch (PDOException $e) {
+            // Handle the exception here, you can log it or take appropriate action
+            echo "<p class='warning'>Error inserting contact: " . $e->getMessage() . "</p>";
+        }
     }
     
     /**
@@ -184,14 +205,19 @@
      * @return void
      */
     function updateContact($pdo, $name, $surname, $phone_number) {
-        $sql = 'UPDATE contacts
-                SET phone_number = :phone_number
-                WHERE name = :name AND surname = :surname';
-        $statement = $pdo->prepare($sql);
-        $statement->bindParam(':phone_number', $phone_number, PDO::PARAM_INT);
-        $statement->bindParam(':name', $name, PDO::PARAM_STR);
-        $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
-        $statement->execute();
+        try {
+            $sql = 'UPDATE contacts
+                    SET phone_number = :phone_number
+                    WHERE name = :name AND surname = :surname';
+            $statement = $pdo->prepare($sql);
+            $statement->bindParam(':phone_number', $phone_number, PDO::PARAM_INT);
+            $statement->bindParam(':name', $name, PDO::PARAM_STR);
+            $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
+            $statement->execute();
+        } catch (PDOException $e) {
+            // Handle the exception here, you can log it or take appropriate action
+            echo "<p class='warning'>Error updating contact: " . $e->getMessage() . "</p>";
+        }
     }
     
     /**
@@ -204,15 +230,20 @@
      * @return void
      */
     function deleteContact($pdo, $name, $surname) {
-        $sql = 'DELETE FROM contacts
-                WHERE name = :name AND surname = :surname';
-        $statement = $pdo->prepare($sql);
-        $statement->bindParam(':name', $name, PDO::PARAM_STR);
-        $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
-        $statement->execute();
+        try {
+            $sql = 'DELETE FROM contacts
+                    WHERE name = :name AND surname = :surname';
+            $statement = $pdo->prepare($sql);
+            $statement->bindParam(':name', $name, PDO::PARAM_STR);
+            $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
+            $statement->execute();
 
-        if ($statement->rowCount() == 0) {
-            echo "<p class='warning'>Este contacto no existe.</p>";
+            if ($statement->rowCount() == 0) {
+                echo "<p class='warning'>Este contacto no existe.</p>";
+            }
+        } catch (PDOException $e) {
+            // Handle the exception here, you can log it or take appropriate action
+            echo "<p class='warning'>Error deleting contact: " . $e->getMessage() . "</p>";
         }
     }
     
