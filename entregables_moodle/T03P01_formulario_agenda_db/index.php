@@ -43,78 +43,107 @@
 
 <?php
     /**
-     * Procesa un formulario para gestionar una agenda de contactos.
+     * Procesa los datos del formulario enviado y actualiza la base de datos en consecuencia.
      *
-     * Esta función procesa los datos enviados a través de un formulario web para gestionar una agenda de contactos.
-     * Puede realizar las siguientes acciones:
+     * Esta función es responsable de manejar el envío del formulario, validar el input,
+     * y realizar acciones como insertar, actualizar, o eliminar contactos en la base de datos.
      *
-     * 1. Guarda los datos de la agenda si el campo "agenda" se encuentra en la solicitud POST.
-     * 2. Valida y guarda el nombre del contacto si el campo "name" está presente y no está vacío.
-     *    Si el campo "name" está vacío, se mostrará un aviso al usuario.
-     * 3. Valida y guarda el número de teléfono del contacto si el campo "phone" está presente y no está vacío.
-     * 4. Si el campo "phone" está vacío pero el campo "name" no, verifica si el contacto con el nombre especificado
-     *    existe en la agenda y, en ese caso, lo elimina.
-     * 5. Si tanto el nombre como el número de teléfono se proporcionan, agrega o actualiza el contacto en la agenda.
+     * @param PDO $pdo Conexión PDO a la base de datos.
      *
-     * @return array Un array asociativo que representa la agenda de contactos después de procesar el formulario.
+     * @return void
      */
     function processForm($pdo) {
-        // Si el campo "agenda" existe al enviar el formulario, lo guarda en la variable $agenda.
-        // Sino, crea de cero el array de "agenda" y lo asigna a $agenda.
-        // if (!isset($_POST['agenda'])) {
-        //     $_POST['agenda'] = array();
-        // }
-
         if (isset($_POST['submit'])) {
-            // Si el campo "name" existe y no está vacío, guardar su valor en $name.
-            // De lo contrario, dar un aviso al usuario para que introduzca su nombre.
-            if (isset($_POST['name']) && !empty($_POST['name'])) {
-                $name = filter_input(INPUT_POST, 'name');
-            } elseif (isset($_POST['name']) && empty($_POST['name'])) {
-                echo "<p class='warning'>¡Introduce un nombre!</p>";
-            }
-
-            if (isset($_POST['surname']) && !empty($_POST['surname'])) {
-                $surname = filter_input(INPUT_POST, 'surname');
-            } elseif (isset($_POST['surname']) && empty($_POST['surname'])) {
-                echo "<p class='warning'>¡Introduce un apellido!</p>";
-            }
-
-            // Si el campo "phone" existe y no está vacío, guardar su valor en $phone.
-            // Si el campo "phone" está vacío, pero el campo "name" y "surname" no:
-            //      Si el campo "agenda" existe, borrar el contacto que coincida con el valor del campo "name".
-            //      De lo contrario, da un aviso al usuario diciendo que el contacto no existe.
-            if (isset($_POST['phone']) && !empty($_POST['phone'])) {
-                $phone = filter_input(INPUT_POST, 'phone');
-            } elseif ((isset($_POST['phone']) && empty($_POST['phone'])) &&
-                        (isset($_POST['name']) && !empty($_POST['name']))) {
-                if (isset($_POST['name']) && isset($_POST['surname'])) {
-                    deleteContact($pdo, $name, $surname);
-                }
-            }
-
-            // Si ambos campos existen al enviar el formulario, añadir los datos a $agenda.
-            if (isset($name) && isset($surname) && isset($phone)) {
-                if (contactExists($pdo, $name, $surname)) {
-                    updateContact($pdo, $name, $surname, $phone);
+            // Sanitiza los valores de los campos y los guarda en variables.
+            $name = processField('name', '¡Introduce un nombre!');
+            $surname = processField('surname', '¡Introduce un apellido!');
+            $phone = processField('phone', '', true);
+    
+            if ($name !== null && $surname !== null) {
+                // Si $phone no es null y no está vacío...
+                if ($phone !== null && !empty($phone)) {
+                    // ...si el contacto existe, lo actualiza.
+                    if (contactExists($pdo, $name, $surname)) {
+                        updateContact($pdo, $name, $surname, $phone);
+                    }
+                    // ...si el contacto no existe, lo inserta.
+                    else {
+                        insertContact($pdo, $name, $surname, $phone);
+                    }
                 } else {
-                    insertContact($pdo, $name, $surname, $phone);
+                    // Si $phone es null, borra el contacto si existe.
+                    if (contactExists($pdo, $name, $surname)) {
+                        deleteContact($pdo, $name, $surname);
+                    }
                 }
             }
         }
     }
+
+    /**
+     * Procesa un campo del formulario, valida su valor, y lo devuelve el valor sanitizado.
+     *
+     * Esta función se utiliza para campos individuales del formulario
+     * con el fin de garantizar una validación y sanitización adecuadas.
+     *
+     * @param string $fieldName     El nombre del campo del formulario.
+     * @param string $emptyMessage  El mensaje de error que se mostrará si el campo está vacío.
+     * @param bool   $allowEmpty    Si se permite un valor vacío (el valor predeterminado es false).
+     *
+     * @return mixed|null El valor sanitizado del campo de formulario, o null si la validación falla.
+     */
+    function processField($fieldName, $emptyMessage, $allowEmpty = false) {
+        // Si el campo se envía en la petición POST, lo devuelve sanitizado.
+        if (isset($_POST[$fieldName])) {
+            $value = filter_input(INPUT_POST, $fieldName);
+
+            // Si el campo es obligatorio y está vacío, muestra un mensaje de advertencia al usuario.
+            if (!$allowEmpty && empty($value)) {
+                echo "<p class='warning'>$emptyMessage</p>";
+                return null;
+            }
+
+            return $value;
+        }
+
+        // Si el campo no se envía en la petición POST, devuelve null.
+        return null;
+    }
     
+    /**
+     * Establece una conexión a la base de datos.
+     *
+     * Esta función usa la clase Database para crear una conexión PDO a la base de datos.
+     *
+     * @return PDO Conexión PDO a la base de datos.
+     */
     function getConnection() {
         include_once "./database.php";
         $database = new Database();
         return $database->getConnection();
     }
 
+    /**
+     * Devuelve todos los contactos de la base de datos.
+     *
+     * @param PDO $pdo Conexión PDO a la base de datos.
+     *
+     * @return PDOStatement|false Devuelve un PDOStatement que representa el conjunto de resultados de la consulta,
+     *                              o falso en caso de error.
+     */
     function getContacts($pdo) {
         return $pdo->query('SELECT * FROM contacts');
-        // return $statement->fetch();
     }
 
+    /**
+     * Comprueba si existe un contacto con el nombre y apellido especificados en la base de datos.
+     *
+     * @param PDO $pdo        Conexión PDO a la base de datos.
+     * @param string $name    El nombre del contacto.
+     * @param string $surname El apellido del contacto.
+     *
+     * @return bool Verdadero si el contacto existe, falso en caso contrario.
+     */
     function contactExists($pdo, $name, $surname) {
         $statement = $pdo->prepare('SELECT * FROM contacts
                             WHERE name = :name AND surname = :surname');
@@ -122,13 +151,19 @@
         $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
         $statement->execute();
 
-        if ($statement->rowCount() >= 1) {
-            return true;
-        }
-        
-        return false;
+        return $statement->rowCount() >= 1;
     }
 
+    /**
+     * Inserta un nuevo contacto en la base de datos.
+     *
+     * @param PDO $pdo              Conexión PDO a la base de datos.
+     * @param string $name          El nombre del contacto.
+     * @param string $surname       El apellido del contacto.
+     * @param string $phone_number  El número de telefono del contacto.
+     *
+     * @return void
+     */
     function insertContact($pdo, $name, $surname, $phone_number) {
         $sql = 'INSERT INTO contacts(name, surname, phone_number)
                 values(:name, :surname, :phone_number)';
@@ -136,6 +171,16 @@
         $statement->execute(['name' => $name, 'surname' => $surname, 'phone_number' => $phone_number]);
     }
     
+    /**
+     * Actualiza el número de teléfono de un contacto existente en la base de datos.
+     *
+     * @param PDO $pdo              Conexión PDO a la base de datos.
+     * @param string $name          El nombre del contacto.
+     * @param string $surname       El apellido del contacto.
+     * @param string $phone_number  El nuevo número de telefono del contacto.
+     *
+     * @return void
+     */
     function updateContact($pdo, $name, $surname, $phone_number) {
         $sql = 'UPDATE contacts
                 SET phone_number = :phone_number
@@ -147,6 +192,15 @@
         $statement->execute();
     }
     
+    /**
+     * Borra un contacto de la base de datos.
+     *
+     * @param PDO $pdo              Conexión PDO a la base de datos.
+     * @param string $name          El nombre del contacto.
+     * @param string $surname       El apellido del contacto.
+     *
+     * @return void
+     */
     function deleteContact($pdo, $name, $surname) {
         $sql = 'DELETE FROM contacts
                 WHERE name = :name AND surname = :surname';
@@ -164,11 +218,10 @@
      * Imprime una agenda en formato tabular.
      *
      * Esta función imprime una tabla HTML que muestra los contactos de la agenda.
-     * La tabla contiene dos columnas, una para el nombre y otra para el número de teléfono.
+     * La tabla contiene tres columnas, una para el nombre, otra para el apellido, y otra para el número de teléfono.
      * Si la agenda está vacía, se mostrará un mensaje indicando que no hay contactos registrados.
      *
-     * @param array $agenda Un array asociativo que contiene los contactos de la agenda,
-     *                      donde las claves son los nombres y los valores son los números de teléfono.
+     * @param PDO $pdo Conexión PDO a la base de datos.
      *
      * @return void
      */
@@ -180,7 +233,7 @@
             echo "<table>
             <tr>
                 <th>Nombre</th>
-                <th>Apellidos</th>
+                <th>Apellido</th>
                 <th>Telefono</th>
             </tr>
             ";
