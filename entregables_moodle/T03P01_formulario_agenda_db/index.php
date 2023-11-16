@@ -135,7 +135,7 @@
             // foreach($_FILES[$fieldName]["tmp_name"] as $key=>$tmp_name) {
                 if ($_FILES[$fieldName]["error"] == UPLOAD_ERR_OK
                      && move_uploaded_file($_FILES[$fieldName]["tmp_name"],
-                      "photos/" . basename($_FILES[$fieldName]["name"]))) {
+                      "./photos/" . basename($_FILES[$fieldName]["name"]))) {
                     // if ($_FILES[$fieldName]["type"] != "image/jpeg"
                     //         || $_FILES[$fieldName]["type"] != "image/png") {
                     //     echo "<p class='warning'>Solo se pueden subir fotos JPEG, JPG, y PNG.</p>";
@@ -280,21 +280,17 @@
      */
     function updateContact($pdo, $name, $surname, $phone_number, $photo = null) {
         try {
-            if ($photo === null && empty($photo)) {
-                $sql = 'UPDATE contacts
-                        SET phone_number = :phone_number
-                        WHERE name = :name AND surname = :surname';
-            } else {
-                $sql = 'UPDATE contacts
-                        SET phone_number = :phone_number, photo = :photo
-                        WHERE name = :name AND surname = :surname';
-            }
+            $sql = 'UPDATE contacts
+                    SET phone_number = :phone_number, photo = :photo
+                    WHERE name = :name AND surname = :surname';
             $statement = $pdo->prepare($sql);
             $statement->bindParam(':phone_number', $phone_number, PDO::PARAM_INT);
             $statement->bindParam(':name', $name, PDO::PARAM_STR);
             $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
             if ($photo !== null && !empty($photo)) {
                 $statement->bindParam(':photo', $photo['name'], PDO::PARAM_STR);
+            } else {
+                $statement->bindParam(':photo', $photo, PDO::PARAM_STR);
             }
             $statement->execute();
         } catch (PDOException $e) {
