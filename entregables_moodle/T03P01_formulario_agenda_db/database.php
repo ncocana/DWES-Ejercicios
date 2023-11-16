@@ -1,21 +1,30 @@
 <?php
 // used to get postgresql database connection
-class Database{
-    private $host = "randion.es";
-    private $db_name = "ncocana_db_agenda";
-    private $username = "ncocana";
-    private $password = "Secretos.2023";
-    public $conn;
+class Database {
+    private const HOST = "randion.es";
+    private const DB_NAME = "ncocana_db_agenda";
+    private const USERNAME = "ncocana";
+    private const PASSWORD = "Secretos.2023";
+    private static $conn;
+
+    // Protected construct.
+    protected function __construct() {}
+
+    // Singletons should not be clonable.
+    private function __clone() {}
+
     // get the database connection
-    public function getConnection(){
-        if ($this->conn == null){
+    public static function getConnection() {
+        if (!isset(self::$conn)){
             try{
-                $this->conn = new PDO("pgsql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
-            }catch(PDOException $exception){
+                self::$conn = new PDO("pgsql:host=" . self::HOST . ";dbname=" . self::DB_NAME, self::USERNAME, self::PASSWORD);
+            } catch(PDOException $exception){
                 echo "Connection error: " . $exception->getMessage();
+            } catch(Exception $exception){
+                echo "Unknown exception: " . $exception->getMessage();
             }
         }
-        return $this->conn;
+        return self::$conn;
     }
 }
 ?>

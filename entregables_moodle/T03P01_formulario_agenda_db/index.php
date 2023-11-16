@@ -123,8 +123,8 @@
         include_once "./database.php";
         
         try {
-            $database = new Database();
-            return $database->getConnection();
+            // $database = new Database();
+            return Database::getConnection();
         } catch (PDOException $e) {
             // Handle the exception here, you can log it or take appropriate action
             echo "<p class='warning'>Error updating contact: " . $e->getMessage() . "</p>";
