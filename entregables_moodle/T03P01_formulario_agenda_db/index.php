@@ -12,7 +12,9 @@
             $connection = getConnection();
 
             // Ejecuta la función para hacer funcionar el formulario.
-            processForm($connection);
+            if ($connection !== null) {
+                processForm($connection);
+            }
         ?>
         <h1>Nuevo contacto</h1>
         <ul>
@@ -20,7 +22,7 @@
             <li><b>Actualizar contacto:</b>  Introduce el nombre y apellido correspondiente con un número de telefono diferente.</li>
             <li><b>Borrar contacto:</b>  Introduce el nombre y apellido correspondiente sin el número de telefono.</li>
         </ul>
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <label for="name">Introduzca su nombre:</label>
             <input type="text" id="name" name="name" required>
             <br>
@@ -29,6 +31,9 @@
             <br>
             <label for="phone">Introduzca su teléfono:</label>
             <input type="number" id="phone" name="phone">
+            <br>
+            <label for="photo">Introduzca sus fotos</label>
+            <input type="file" name="photo" id="photo" value=""/>
             <br>
             <input type="submit" name="submit" value="Enviar">
         </form>
@@ -58,17 +63,28 @@
             $name = processField('name', '¡Introduce un nombre!');
             $surname = processField('surname', '¡Introduce un apellido!');
             $phone = processField('phone', '', true);
-    
+            if (!empty($_FILES['photo']['tmp_name'])) {
+                $photo = processFieldPhotos('photo');
+            }
+
             if ($name !== null && $surname !== null) {
                 // Si $phone no es null y no está vacío...
                 if ($phone !== null && !empty($phone)) {
                     // ...si el contacto existe, lo actualiza.
                     if (contactExists($pdo, $name, $surname)) {
-                        updateContact($pdo, $name, $surname, $phone);
+                        if (!empty($_FILES['photo']['tmp_name'])) {
+                            updateContact($pdo, $name, $surname, $phone, $photo);
+                        } else {
+                            updateContact($pdo, $name, $surname, $phone);
+                        }
                     }
                     // ...si el contacto no existe, lo inserta.
                     else {
-                        insertContact($pdo, $name, $surname, $phone);
+                        if (!empty($_FILES['photo']['tmp_name'])) {
+                            insertContact($pdo, $name, $surname, $phone, $photo);
+                        } else {
+                            insertContact($pdo, $name, $surname, $phone);
+                        }
                     }
                 } else {
                     // Si $phone es null, borra el contacto si existe.
@@ -111,13 +127,59 @@
         // Si el campo no se envía en la petición POST, devuelve null.
         return null;
     }
+
+    function processFieldPhotos($fieldName) {
+        // Si el campo se envía en la petición POST, lo devuelve sanitizado.
+        $photoUploaded = false;
+        if (isset($_FILES[$fieldName])) {
+            // foreach($_FILES[$fieldName]["tmp_name"] as $key=>$tmp_name) {
+                if ($_FILES[$fieldName]["error"] == UPLOAD_ERR_OK
+                     && move_uploaded_file($_FILES[$fieldName]["tmp_name"],
+                      "photos/" . basename($_FILES[$fieldName]["name"]))) {
+                    // if ($_FILES[$fieldName]["type"] != "image/jpeg"
+                    //         || $_FILES[$fieldName]["type"] != "image/png") {
+                    //     echo "<p class='warning'>Solo se pueden subir fotos JPEG, JPG, y PNG.</p>";
+                    // } else {
+                    //     echo "<br>Foto subida";
+                    //     $photosUploaded = true;
+                    // }
+                    $photoUploaded = true;
+                } else {
+                    switch ($_FILES[$fieldName]["error"]) {
+                        case UPLOAD_ERR_INI_SIZE:
+                            $message = "<p class='warning'>La foto es de un tamaño mayor
+                             de lo que permite el servidor.</p>";
+                            break;
+                        case UPLOAD_ERR_FORM_SIZE:
+                            $message = "<p class='warning'>La foto es de un tamaño mayor
+                             de lo que permite el script.</p>";
+                            break;
+                        case UPLOAD_ERR_NO_FILE:
+                            $message = "<p class='warning'>No se ha subido ningun archivo.
+                             Asegúrese de que ha elegido un archvivo para subir.</p>";
+                            break;
+                        default:
+                            $message = "<p class='warning'>Por favor, contacte con el administrador
+                             del servidor para ayuda." . var_dump($_FILES) . "</p>";
+                    }
+                    echo "<p class='warning'>Lo siento, ha habido un problema subiendo esta foto. $message</p>";
+                }
+            // }
+            if ($photoUploaded === true) {
+                return $_FILES[$fieldName];
+            }
+        }
+    
+        // Si el campo no se envía en la petición POST, devuelve null.
+        return null;
+    }
     
     /**
      * Establece una conexión a la base de datos.
      *
      * Esta función usa la clase Database para crear una conexión PDO a la base de datos.
      *
-     * @return PDO Conexión PDO a la base de datos.
+     * @return PDO|null Conexión PDO a la base de datos, o null si la conexión falla.
      */
     function getConnection() {
         include_once "./database.php";
@@ -128,6 +190,7 @@
         } catch (PDOException $e) {
             // Handle the exception here, you can log it or take appropriate action
             echo "<p class='warning'>Error updating contact: " . $e->getMessage() . "</p>";
+            return null;
         }
     }
 
@@ -182,12 +245,23 @@
      *
      * @return void
      */
-    function insertContact($pdo, $name, $surname, $phone_number) {
+    function insertContact($pdo, $name, $surname, $phone_number, $photo = null) {
         try {
-            $sql = 'INSERT INTO contacts(name, surname, phone_number)
-                    values(:name, :surname, :phone_number)';
+            if ($photo === null && empty($photo)) {
+                $sql = 'INSERT INTO contacts(name, surname, phone_number)
+                        values(:name, :surname, :phone_number)';
+            } else {
+                $sql = 'INSERT INTO contacts(name, surname, phone_number, photo)
+                        values(:name, :surname, :phone_number, :photo)';
+            }
             $statement = $pdo->prepare($sql);
-            $statement->execute(['name' => $name, 'surname' => $surname, 'phone_number' => $phone_number]);
+            $statement->bindParam(':name', $name, PDO::PARAM_STR);
+            $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
+            $statement->bindParam(':phone_number', $phone_number, PDO::PARAM_INT);
+            if ($photo !== null && !empty($photo)) {
+                $statement->bindParam(':photo', $photo['name'], PDO::PARAM_STR);
+            }
+            $statement->execute();
         } catch (PDOException $e) {
             // Handle the exception here, you can log it or take appropriate action
             echo "<p class='warning'>Error inserting contact: " . $e->getMessage() . "</p>";
@@ -204,15 +278,24 @@
      *
      * @return void
      */
-    function updateContact($pdo, $name, $surname, $phone_number) {
+    function updateContact($pdo, $name, $surname, $phone_number, $photo = null) {
         try {
-            $sql = 'UPDATE contacts
-                    SET phone_number = :phone_number
-                    WHERE name = :name AND surname = :surname';
+            if ($photo === null && empty($photo)) {
+                $sql = 'UPDATE contacts
+                        SET phone_number = :phone_number
+                        WHERE name = :name AND surname = :surname';
+            } else {
+                $sql = 'UPDATE contacts
+                        SET phone_number = :phone_number, photo = :photo
+                        WHERE name = :name AND surname = :surname';
+            }
             $statement = $pdo->prepare($sql);
             $statement->bindParam(':phone_number', $phone_number, PDO::PARAM_INT);
             $statement->bindParam(':name', $name, PDO::PARAM_STR);
             $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
+            if ($photo !== null && !empty($photo)) {
+                $statement->bindParam(':photo', $photo['name'], PDO::PARAM_STR);
+            }
             $statement->execute();
         } catch (PDOException $e) {
             // Handle the exception here, you can log it or take appropriate action
@@ -268,6 +351,7 @@
                 <th>Nombre</th>
                 <th>Apellido</th>
                 <th>Telefono</th>
+                <th>Imagen</th>
             </tr>
             ";
             foreach ($contacts as $row) {
@@ -275,6 +359,7 @@
                     <td>" . $row['name'] . "</td>
                     <td>" . $row['surname'] . "</td>
                     <td>" . $row['phone_number'] . "</td>
+                    <td>" . ($row['photo']? "<img src='./photos/". $row['photo'] . "' style='width:70px;height:auto;'>" : "—") . "</td>
                 </tr>
                 ";
             }
