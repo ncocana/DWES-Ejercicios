@@ -133,7 +133,9 @@
         $photoUploaded = false;
         if (isset($_FILES[$fieldName])) {
             // foreach($_FILES[$fieldName]["tmp_name"] as $key=>$tmp_name) {
-                if ($_FILES[$fieldName]["error"] == UPLOAD_ERR_OK) {
+                if ($_FILES[$fieldName]["error"] == UPLOAD_ERR_OK
+                     && move_uploaded_file($_FILES[$fieldName]["tmp_name"],
+                      "./photos/" . basename($_FILES[$fieldName]["name"]))) {
                     // if ($_FILES[$fieldName]["type"] != "image/jpeg"
                     //         || $_FILES[$fieldName]["type"] != "image/png") {
                     //     echo "<p class='warning'>Solo se pueden subir fotos JPEG, JPG, y PNG.</p>";
@@ -164,7 +166,7 @@
                 }
             // }
             if ($photoUploaded === true) {
-                return file_get_contents($_FILES[$fieldName]['tmp_name']);
+                return $_FILES[$fieldName];
             }
         }
     
@@ -257,7 +259,7 @@
             $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
             $statement->bindParam(':phone_number', $phone_number, PDO::PARAM_INT);
             if ($photo !== null && !empty($photo)) {
-                $statement->bindParam(':photo', $photo, PDO::PARAM_LOB);
+                $statement->bindParam(':photo', $photo['name'], PDO::PARAM_STR);
             }
             $statement->execute();
         } catch (PDOException $e) {
@@ -286,7 +288,7 @@
             $statement->bindParam(':name', $name, PDO::PARAM_STR);
             $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
             if ($photo !== null && !empty($photo)) {
-                $statement->bindParam(':photo', $photo, PDO::PARAM_LOB);
+                $statement->bindParam(':photo', $photo['name'], PDO::PARAM_STR);
             } else {
                 $statement->bindParam(':photo', $photo, PDO::PARAM_STR);
             }
@@ -353,7 +355,7 @@
                     <td>" . $row['name'] . "</td>
                     <td>" . $row['surname'] . "</td>
                     <td>" . $row['phone_number'] . "</td>
-                    <td>" . ($row['photo']? "<img src='./display_image.php?id=" . $row['id'] . "' style='width:70px;height:auto;'>" : "—") . "</td>
+                    <td>" . ($row['photo']? "<img src='./photos/". $row['photo'] . "' style='width:70px;height:auto;'>" : "—") . "</td>
                 </tr>
                 ";
             }
