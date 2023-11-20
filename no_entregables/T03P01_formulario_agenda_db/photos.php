@@ -22,16 +22,16 @@
                 return null;
             }
 
-            $statement = $pdo->prepare("SELECT * FROM photos where owner_id = $id");
+            $statement = $pdo->prepare("SELECT * FROM photos where contact_id = $id");
             $statement->execute();
 
             if ($statement->rowCount() >= 1) {
                 foreach ($statement as $row) {
                     echo "<h2>" . $row['name'] . "</h2>";
-                    echo "<img src='./photos/" . $row['name'] . "'</img><br>";
+                    echo "<img src='./photos/" . $row['name'] . "' style='max-width: 500px;'</img><br>";
                 }
             } else {
-                echo "Este contacto no tiene imágenes subidas.";
+                echo "Este contacto no tiene fotos subidas.";
             }
         ?>
         <br><br>

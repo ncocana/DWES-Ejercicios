@@ -19,8 +19,11 @@
         <h1>Nuevo contacto</h1>
         <ul>
             <li><b>Añadir contacto:</b> Introduce los datos requeridos.</li>
-            <li><b>Actualizar contacto:</b>  Introduce el nombre y apellido correspondiente con un número de telefono diferente.</li>
-            <li><b>Borrar contacto:</b>  Introduce el nombre y apellido correspondiente sin el número de telefono.</li>
+            <li><b>Actualizar contacto:</b> Introduce el nombre y apellido
+             correspondiente con un número de telefono diferente.</li>
+            <li><b>Borrar contacto:</b> Introduce el nombre y apellido correspondiente sin el número de telefono.</li>
+            <li><b>Añadir foto:</b> Puedes añadir fotos indendientemente de
+             si estás creando o actualizando un contacto.</li>
         </ul>
         <form method="POST" enctype="multipart/form-data">
             <label for="name">Introduzca su nombre:</label>
@@ -32,7 +35,7 @@
             <label for="phone">Introduzca su teléfono:</label>
             <input type="number" id="phone" name="phone">
             <br>
-            <label for="photos">Introduzca sus fotos</label>
+            <label for="photos">Introduzca sus fotos:</label>
             <input type="file" name="photos[]" id="photos" value="" multiple/>
             <br>
             <input type="submit" name="submit" value="Enviar">
@@ -73,12 +76,16 @@
                     // ...si el contacto existe, lo actualiza.
                     if (contactExists($pdo, $name, $surname)) {
                         updateContact($pdo, $name, $surname, $phone);
+                        if (!empty($_FILES['photos']['tmp_name'][0])) {
+                            $idContact = getContact($pdo, $name, $surname);
+                            insertPhotos($pdo, $photos, $idContact);
+                        }
                     }
                     // ...si el contacto no existe, lo inserta.
                     else {
                         insertContact($pdo, $name, $surname, $phone);
-                        $idContact = getContact($pdo, $name, $surname);
                         if (!empty($_FILES['photos']['tmp_name'][0])) {
+                            $idContact = getContact($pdo, $name, $surname);
                             insertPhotos($pdo, $photos, $idContact);
                         }
                     }
@@ -212,7 +219,7 @@
             return $id;
         } catch (PDOException $e) {
             // Handle the exception here, you can log it or take appropriate action
-            echo "<p class='warning'>Error updating contact: " . $e->getMessage() . "</p>";
+            echo "<p class='warning'>Error getting contact: " . $e->getMessage() . "</p>";
         }
     }
 
@@ -221,7 +228,7 @@
             return $pdo->query('SELECT * FROM photos');
         } catch (PDOException $e) {
             // Handle the exception here, you can log it or take appropriate action
-            echo "<p class='warning'>Error getting photo: " . $e->getMessage() . "</p>";
+            echo "<p class='warning'>Error getting photos: " . $e->getMessage() . "</p>";
         }
     }
 
@@ -245,7 +252,7 @@
             return $statement->rowCount() >= 1;
         } catch (PDOException $e) {
             // Handle the exception here, you can log it or take appropriate action
-            echo "<p class='warning'>Error updating contact: " . $e->getMessage() . "</p>";
+            echo "<p class='warning'>Error checking contact: " . $e->getMessage() . "</p>";
         }
     }
 
@@ -329,13 +336,24 @@
     
     function insertPhotos($pdo, $photos, $idContact) {
         try {
-            $sql = 'INSERT INTO photos(name, owner_id)
-                    values(:name, :owner_id)';
+            $sql = 'INSERT INTO photos(name, contact_id)
+                    values(:name, :contact_id)';
             $statement = $pdo->prepare($sql);
             for ($i = 0; $i < count($photos); $i++) {
-                $statement->bindParam(':name', $photos[$i], PDO::PARAM_STR);
-                $statement->bindParam(':owner_id', $idContact, PDO::PARAM_INT);
-                $statement->execute();
+                try {
+                    $statement->bindParam(':name', $photos[$i], PDO::PARAM_STR);
+                    $statement->bindParam(':contact_id', $idContact, PDO::PARAM_INT);
+                    $statement->execute();
+                } catch (PDOException $e) {
+                    // Check for unique violation error.
+                    if ($e->getCode() == '23505') {
+                        echo "<p class='warning'>Error inserting photo: Duplicate entry for photo '" . $photos[$i] . "'
+                         for contact ID " . $idContact . "</p><br>";
+                    } else {
+                        // Handle other exceptions.
+                        throw $e;
+                    }
+                }
             }
         } catch (PDOException $e) {
             // Handle the exception here, you can log it or take appropriate action
