@@ -7,6 +7,6 @@
 
 ## Introducción
 
-Práctica en PHP para programar un formulario con el que introducir contactos (nombre + apelllido + número de teléfono) en una agenda, añadiendole esta vez una base de datos para que los datos persistan. Se pueden editar los números al introducir el nombre del contacto con un número distinto, y borrar el contacto introduciendo solo su nombre.  
+Práctica en PHP para programar un formulario con el que introducir contactos (nombre + apelllido + número de teléfono) más fotos de su elección en una agenda, añadiendole esta vez una base de datos para que los datos persistan. Se pueden editar los números al introducir el nombre del contacto con un número distinto, borrar el contacto introduciendo solo su nombre, y añadir fotos sin tener que crear un nuevo contacto.  
 
 ![Index - Table](./docs/index.png)
