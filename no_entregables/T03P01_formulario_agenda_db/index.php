@@ -32,8 +32,8 @@
             <label for="phone">Introduzca su teléfono:</label>
             <input type="number" id="phone" name="phone">
             <br>
-            <label for="photo">Introduzca sus fotos</label>
-            <input type="file" name="photo" id="photo" value=""/>
+            <label for="photos">Introduzca sus fotos</label>
+            <input type="file" name="photos[]" id="photos" value="" multiple/>
             <br>
             <input type="submit" name="submit" value="Enviar">
         </form>
@@ -63,8 +63,8 @@
             $name = processField('name', '¡Introduce un nombre!');
             $surname = processField('surname', '¡Introduce un apellido!');
             $phone = processField('phone', '', true);
-            if (!empty($_FILES['photo']['tmp_name'])) {
-                $photo = processFieldPhotos('photo');
+            if (!empty($_FILES['photos']['tmp_name'][0])) {
+                $photos = processFieldPhotos('photos');
             }
 
             if ($name !== null && $surname !== null) {
@@ -72,18 +72,14 @@
                 if ($phone !== null && !empty($phone)) {
                     // ...si el contacto existe, lo actualiza.
                     if (contactExists($pdo, $name, $surname)) {
-                        if (!empty($_FILES['photo']['tmp_name'])) {
-                            updateContact($pdo, $name, $surname, $phone, $photo);
-                        } else {
-                            updateContact($pdo, $name, $surname, $phone);
-                        }
+                        updateContact($pdo, $name, $surname, $phone);
                     }
                     // ...si el contacto no existe, lo inserta.
                     else {
-                        if (!empty($_FILES['photo']['tmp_name'])) {
-                            insertContact($pdo, $name, $surname, $phone, $photo);
-                        } else {
-                            insertContact($pdo, $name, $surname, $phone);
+                        insertContact($pdo, $name, $surname, $phone);
+                        $idContact = getContact($pdo, $name, $surname);
+                        if (!empty($_FILES['photos']['tmp_name'][0])) {
+                            insertPhotos($pdo, $photos, $idContact);
                         }
                     }
                 } else {
@@ -130,20 +126,15 @@
 
     function processFieldPhotos($fieldName) {
         // Si el campo se envía en la petición POST, lo devuelve sanitizado.
-        $photoUploaded = false;
+        $photosUploaded = false;
+        $photosArray = array();
         if (isset($_FILES[$fieldName])) {
-            // foreach($_FILES[$fieldName]["tmp_name"] as $key=>$tmp_name) {
-                if ($_FILES[$fieldName]["error"] == UPLOAD_ERR_OK) {
-                    // if ($_FILES[$fieldName]["type"] != "image/jpeg"
-                    //         || $_FILES[$fieldName]["type"] != "image/png") {
-                    //     echo "<p class='warning'>Solo se pueden subir fotos JPEG, JPG, y PNG.</p>";
-                    // } else {
-                    //     echo "<br>Foto subida";
-                    //     $photosUploaded = true;
-                    // }
-                    $photoUploaded = true;
+            foreach($_FILES[$fieldName]["tmp_name"] as $key=>$tmp_name) {
+                if ($_FILES[$fieldName]["error"][$key] == UPLOAD_ERR_OK && move_uploaded_file($_FILES[$fieldName]["tmp_name"][$key], "./photos/" . basename($_FILES[$fieldName]["name"][$key]))) {
+                    $photosArray[$key] = $_FILES[$fieldName]["name"][$key];
+                    $photosUploaded = true;
                 } else {
-                    switch ($_FILES[$fieldName]["error"]) {
+                    switch ($_FILES[$fieldName]["error"][$key]) {
                         case UPLOAD_ERR_INI_SIZE:
                             $message = "<p class='warning'>La foto es de un tamaño mayor
                              de lo que permite el servidor.</p>";
@@ -162,9 +153,9 @@
                     }
                     echo "<p class='warning'>Lo siento, ha habido un problema subiendo esta foto. $message</p>";
                 }
-            // }
-            if ($photoUploaded === true) {
-                return file_get_contents($_FILES[$fieldName]['tmp_name']);
+            }
+            if ($photosUploaded === true) {
+                return $photosArray;
             }
         }
     
@@ -202,10 +193,35 @@
      */
     function getContacts($pdo) {
         try {
-            return $pdo->query('SELECT * FROM contacts');
+            return $pdo->query('SELECT * FROM contacts2');
+        } catch (PDOException $e) {
+            // Handle the exception here, you can log it or take appropriate action
+            echo "<p class='warning'>Error getting contact: " . $e->getMessage() . "</p>";
+        }
+    }
+
+    function getContact($pdo, $name, $surname) {
+        try {
+            $statement = $pdo->prepare('SELECT * FROM contacts2
+                                WHERE name = :name AND surname = :surname');
+            $statement->bindParam(':name', $name, PDO::PARAM_STR);
+            $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
+            $statement->execute();
+            $id = $statement->fetch()['id'];
+
+            return $id;
         } catch (PDOException $e) {
             // Handle the exception here, you can log it or take appropriate action
             echo "<p class='warning'>Error updating contact: " . $e->getMessage() . "</p>";
+        }
+    }
+
+    function getPhotos($pdo) {
+        try {
+            return $pdo->query('SELECT * FROM photos');
+        } catch (PDOException $e) {
+            // Handle the exception here, you can log it or take appropriate action
+            echo "<p class='warning'>Error getting photo: " . $e->getMessage() . "</p>";
         }
     }
 
@@ -220,7 +236,7 @@
      */
     function contactExists($pdo, $name, $surname) {
         try {
-            $statement = $pdo->prepare('SELECT * FROM contacts
+            $statement = $pdo->prepare('SELECT * FROM contacts2
                                 WHERE name = :name AND surname = :surname');
             $statement->bindParam(':name', $name, PDO::PARAM_STR);
             $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
@@ -243,22 +259,14 @@
      *
      * @return void
      */
-    function insertContact($pdo, $name, $surname, $phone_number, $photo = null) {
+    function insertContact($pdo, $name, $surname, $phone_number) {
         try {
-            if ($photo === null && empty($photo)) {
-                $sql = 'INSERT INTO contacts(name, surname, phone_number)
-                        values(:name, :surname, :phone_number)';
-            } else {
-                $sql = 'INSERT INTO contacts(name, surname, phone_number, photo)
-                        values(:name, :surname, :phone_number, :photo)';
-            }
+            $sql = 'INSERT INTO contacts2(name, surname, phone_number)
+                    values(:name, :surname, :phone_number)';
             $statement = $pdo->prepare($sql);
             $statement->bindParam(':name', $name, PDO::PARAM_STR);
             $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
             $statement->bindParam(':phone_number', $phone_number, PDO::PARAM_INT);
-            if ($photo !== null && !empty($photo)) {
-                $statement->bindParam(':photo', $photo, PDO::PARAM_LOB);
-            }
             $statement->execute();
         } catch (PDOException $e) {
             // Handle the exception here, you can log it or take appropriate action
@@ -276,20 +284,15 @@
      *
      * @return void
      */
-    function updateContact($pdo, $name, $surname, $phone_number, $photo = null) {
+    function updateContact($pdo, $name, $surname, $phone_number) {
         try {
-            $sql = 'UPDATE contacts
-                    SET phone_number = :phone_number, photo = :photo
+            $sql = 'UPDATE contacts2
+                    SET phone_number = :phone_number
                     WHERE name = :name AND surname = :surname';
             $statement = $pdo->prepare($sql);
             $statement->bindParam(':phone_number', $phone_number, PDO::PARAM_INT);
             $statement->bindParam(':name', $name, PDO::PARAM_STR);
             $statement->bindParam(':surname', $surname, PDO::PARAM_STR);
-            if ($photo !== null && !empty($photo)) {
-                $statement->bindParam(':photo', $photo, PDO::PARAM_LOB);
-            } else {
-                $statement->bindParam(':photo', $photo, PDO::PARAM_STR);
-            }
             $statement->execute();
         } catch (PDOException $e) {
             // Handle the exception here, you can log it or take appropriate action
@@ -308,7 +311,7 @@
      */
     function deleteContact($pdo, $name, $surname) {
         try {
-            $sql = 'DELETE FROM contacts
+            $sql = 'DELETE FROM contacts2
                     WHERE name = :name AND surname = :surname';
             $statement = $pdo->prepare($sql);
             $statement->bindParam(':name', $name, PDO::PARAM_STR);
@@ -324,6 +327,22 @@
         }
     }
     
+    function insertPhotos($pdo, $photos, $idContact) {
+        try {
+            $sql = 'INSERT INTO photos(name, owner_id)
+                    values(:name, :owner_id)';
+            $statement = $pdo->prepare($sql);
+            for ($i = 0; $i < count($photos); $i++) {
+                $statement->bindParam(':name', $photos[$i], PDO::PARAM_STR);
+                $statement->bindParam(':owner_id', $idContact, PDO::PARAM_INT);
+                $statement->execute();
+            }
+        } catch (PDOException $e) {
+            // Handle the exception here, you can log it or take appropriate action
+            echo "<p class='warning'>Error inserting photos: " . $e->getMessage() . "</p>";
+        }
+    }
+
     /**
      * Imprime una agenda en formato tabular.
      *
@@ -345,7 +364,7 @@
                 <th>Nombre</th>
                 <th>Apellido</th>
                 <th>Telefono</th>
-                <th>Imagen</th>
+                <th>Fotos</th>
             </tr>
             ";
             foreach ($contacts as $row) {
@@ -353,7 +372,7 @@
                     <td>" . $row['name'] . "</td>
                     <td>" . $row['surname'] . "</td>
                     <td>" . $row['phone_number'] . "</td>
-                    <td>" . ($row['photo']? "<img src='./display_image.php?id=" . $row['id'] . "' style='width:70px;height:auto;'>" : "—") . "</td>
+                    <td><a href='photos.php?id=" . $row['id'] . "'><button type='button'>Ver fotos</button></a></td>
                 </tr>
                 ";
             }
