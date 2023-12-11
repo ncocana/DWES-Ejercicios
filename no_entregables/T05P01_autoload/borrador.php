@@ -92,6 +92,13 @@
     // }
 
     // spl_autoload_register('autoload_class_multiple_directory');
+
+    
+    // Fatal error: __autoload() is no longer supported, use spl_autoload_register() instead.
+    // function __autoload($nomclase) {
+    //     require_once("clases1/$nomclase.php");
+    // }
+    
     require_once __DIR__.'/autoload/autoload.php';
 
     $obj = new Class1();
