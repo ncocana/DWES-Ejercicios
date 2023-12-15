@@ -23,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        // RELATION REQUIRED: "USER BELONGSTO PROFILE - PROFILE HASONE USER"
         // 'profile_id',
     ];
 

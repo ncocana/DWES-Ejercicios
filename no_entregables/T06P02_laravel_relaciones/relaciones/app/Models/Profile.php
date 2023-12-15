@@ -20,6 +20,7 @@ class Profile extends Model
         'username',
         'alias',
         'address',
+        // RELATION REQUIRED: "USER HASONE PROFILE - PROFILE BELONGSTO USER"
         'user_id',
     ];
 
