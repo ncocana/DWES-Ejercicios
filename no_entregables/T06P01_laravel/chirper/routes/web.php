@@ -55,3 +55,7 @@ Route::view('/adminlte', 'adminlte.index')->name('layout');
 // Route::get('phpinfo', [InfoController::class, 'infoServer']);
 
 Route::view('phpinfo', 'phpinfo')->middleware('auth');
+
+Route::fallback(function () {
+    return redirect('/');
+});

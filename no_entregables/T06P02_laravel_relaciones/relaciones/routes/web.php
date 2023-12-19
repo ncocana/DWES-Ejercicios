@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Profile2Controller;
+use App\Http\Controllers\Profile3Controller;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,3 +39,16 @@ Route::middleware('auth')->group(function () {
 // })->middleware(['auth', 'verified'])->name('profile2');
 
 require __DIR__.'/auth.php';
+
+// Route::get('/adminlte/form', function () {
+//     return view('form.index');
+// })->middleware(['auth', 'verified'])->name('form');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/adminlte/form', [Profile3Controller::class, 'edit'])->name('form.index');
+    Route::patch('/adminlte/form', [Profile3Controller::class, 'update'])->name('form.update');
+});
+
+Route::get('/adminlte', function () {
+    return view('adminlte.index');
+});
