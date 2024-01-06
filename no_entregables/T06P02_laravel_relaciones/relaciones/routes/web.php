@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Profile2Controller;
 use App\Http\Controllers\Profile3Controller;
@@ -52,3 +53,16 @@ Route::middleware('auth')->group(function () {
 Route::get('/adminlte', function () {
     return view('adminlte.index');
 });
+
+// CHANGES IT ONLY ON THE ROUTE CREATED
+// use Illuminate\Support\Facades\App;
+// Route::get('/greeting/{locale}', function ($locale) {
+//     if (! in_array($locale, ['en', 'es'])) {
+//         abort(400);
+//     }
+//     App::setLocale($locale);
+//     echo env('APP_LOCALE');
+//     return view('dashboard');
+// });
+
+Route::post('/language-switch', [LanguageController::class, 'languageSwitch'])->name('language.switch');
