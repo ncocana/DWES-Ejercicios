@@ -29,6 +29,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'language' => fake()->languageCode(),
             'remember_token' => Str::random(10),
             // RELATION REQUIRED: "USER BELONGSTO PROFILE - PROFILE HASONE USER"
             // 'profile_id' => fake()->numberBetween(1, Profile::count()),

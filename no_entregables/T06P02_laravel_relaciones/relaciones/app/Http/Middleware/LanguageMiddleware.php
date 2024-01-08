@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,7 +19,10 @@ class LanguageMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         // Get the selected language from session
-        $language = session('language');
+        // $language = session('language');
+
+        // Get the selected language from the user's record
+        $language = Auth::user()->language ?? config('app.locale');
 
         // Set the current language
         app()->setLocale($language);

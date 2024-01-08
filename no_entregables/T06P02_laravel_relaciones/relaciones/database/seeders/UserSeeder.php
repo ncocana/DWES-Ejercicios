@@ -22,6 +22,7 @@ class UserSeeder extends Seeder
                 'email' => 'ncocana@cifpfbmoll.eu',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
+                'language' => 'en',
             ]);
 
         // 5 usuarios sin perfil asociado.
