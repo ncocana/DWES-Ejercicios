@@ -22,7 +22,10 @@ class LanguageMiddleware
         // $language = session('language');
 
         // Get the selected language from the user's record
-        $language = Auth::user()->language ?? config('app.locale');
+        // $language = Auth::user()->language ?? config('app.locale');
+
+        // Get the selected language from the cookie or use the default locale
+        $language = $request->cookie('preferred_language') ?? config('app.locale');
 
         // Set the current language
         app()->setLocale($language);

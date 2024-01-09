@@ -16,8 +16,13 @@ class LanguageController extends Controller
         // session(['language' => $language]);
 
         // Save the language in the user's record
-        Auth::user()->update(['language' => $language]);
+        // Auth::user()->update(['language' => $language]);
 
-        return redirect()->back()->with(['language_switched' => $language]);
+        // return redirect()->back()->with(['language_switched' => $language]);
+
+        // Save the language in a cookie
+        return redirect()
+        ->back()
+        ->withCookie(cookie('preferred_language', $language));
     }
 }
