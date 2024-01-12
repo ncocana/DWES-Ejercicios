@@ -29,3 +29,7 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+Route::get('/form', function () {
+    return view('form.index');
+})->middleware(['auth', 'verified'])->name('form');
