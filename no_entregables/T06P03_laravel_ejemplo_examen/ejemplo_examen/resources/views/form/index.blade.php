@@ -6,11 +6,11 @@
     <div class="content-wrapper">
         <div class="content-header d-flex flex-row align-items-baseline">
             <h1 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Posts') }}
+                {{ __('posts-form.Posts') }}
             </h1>
 
             <p class="text-md text-gray-600 pl-2">
-                {{ __("Create publication") }}
+                {{ __("posts-form.Create publication") }}
             </p>
         </div>
 
