@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->string('extract')->nullable();
-            $table->string('content');
+            $table->mediumText('content');
             $table->boolean('expirable')->default(false);
             $table->boolean('commentable')->default(false);
             $table->string('access');
