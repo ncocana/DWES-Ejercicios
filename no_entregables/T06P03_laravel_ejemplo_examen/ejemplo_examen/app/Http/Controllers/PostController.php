@@ -38,10 +38,13 @@ class PostController extends Controller
         // Create a new post and fill it with the validated data
         $post = new Post($validated);
 
+        $post->commentable = $request->input('commentable') ? true : false;
+        $post->expirable = $request->input('expirable') ? true : false;
+
         // Associate the post with the authenticated user
         $request->user()->posts()->save($post);
 
-        return redirect(route('form.index'));
+        return redirect(route('posts.index'));
     }
 
     /**

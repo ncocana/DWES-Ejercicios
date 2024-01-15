@@ -19,7 +19,7 @@ class ApiPostController extends Controller
 
         $post->update($validated);
 
-        return redirect(route('form.index'));
+        return redirect(route('posts.index'));
     }
 
     /**
@@ -31,6 +31,6 @@ class ApiPostController extends Controller
  
         $post->delete();
  
-        return redirect(route('form.index'));
+        return redirect(route('posts.index'));
     }
 }

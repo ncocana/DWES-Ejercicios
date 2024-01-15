@@ -34,9 +34,9 @@ require __DIR__.'/auth.php';
 
 Route::post('/language-switch', [LanguageController::class, 'languageSwitch'])->name('language.switch');
 
-Route::get('/form', function () {
-    return view('form.index');
-})->middleware(['auth', 'verified'])->name('form.index');
+// Route::get('/form', function () {
+//     return view('form.index');
+// })->middleware(['auth', 'verified'])->name('form.index');
 
 Route::resource('posts', PostController::class)
     ->only(['index', 'store', 'edit'])
