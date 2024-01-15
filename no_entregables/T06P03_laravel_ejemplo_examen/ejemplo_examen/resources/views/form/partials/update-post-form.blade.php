@@ -5,6 +5,17 @@
         </h2>
     </header>
 
+    <!-- Display validation errors at the beginning of the form -->
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form method="post" action="" class="mt-6 space-y-6">
         @csrf
         @method('patch')
