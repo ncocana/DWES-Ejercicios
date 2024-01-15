@@ -33,9 +33,13 @@ class PostController extends Controller
      */
     public function store(PostUpdateRequest $request): RedirectResponse
     {
-        $validated = $request->user()->fill($request->validated());
+        $validated = $request->validated();
 
-        $request->user()->posts()->create($validated);
+        // Create a new post and fill it with the validated data
+        $post = new Post($validated);
+
+        // Associate the post with the authenticated user
+        $request->user()->posts()->save($post);
 
         return redirect(route('form.index'));
     }

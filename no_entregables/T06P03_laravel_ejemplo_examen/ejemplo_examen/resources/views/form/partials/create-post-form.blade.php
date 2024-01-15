@@ -16,19 +16,18 @@
         </div>
     @endif
 
-    <form method="post" action="{{ route('posts.update', $post) }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('posts.store') }}" class="mt-6 space-y-6">
         @csrf
-        @method('patch')
 
         <div class="form-group">
             <label for="title">{{ __('Title of the publication') }}</label>
             <input id="title" name="title" type="text" class="form-control" :value="old('title', $post->title)" placeholder="{{ __('Write here the title of the publication') }}" required autofocus autocomplete="title" >
-            <x-input-error class="mt-2" :messages="$errors->get('title')" />
+            <x-input-error class="mt-2 alert alert-danger" :messages="$errors->get('title')" />
         </div>
 
         <div class="form-group">
             <label for="extract">{{ __('Extract publication') }}</label>
-            <input id="extract" name="extract" type="text" class="form-control" :value="old('extract', $post->extract)" placeholder="{{ __('Write here a extract of the publication') }}" required autofocus autocomplete="extract" >
+            <input id="extract" name="extract" type="text" class="form-control" :value="old('extract', $post->extract)" placeholder="{{ __('Write here a extract of the publication') }}" autofocus autocomplete="extract" >
             <x-input-error class="mt-2" :messages="$errors->get('extract')" />
         </div>
 
@@ -58,7 +57,7 @@
 
         <div class="form-group">
             <label for="access">{{ __('Access')}}</label>
-            <select class="form-control" id="access">
+            <select class="form-control" id="access" name="access">
                 <option value="public" @if (old('access') === 'public') selected @endif>{{ __('Public') }}</option>
                 <option value="private" @if (old('access') === 'private') selected @endif>{{ __('Private') }}</option>
             </select>
@@ -66,7 +65,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button class="btn btn-primary">{{ __('Update') }}</x-primary-button>
+            <x-primary-button class="btn btn-primary">{{ __('Publish') }}</x-primary-button>
 
             @if (session('status') === 'post-created')
                 <p
@@ -75,7 +74,7 @@
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
                     class="text-sm text-gray-600"
-                >{{ __('Updated') }}</p>
+                >{{ __('Published') }}</p>
             @endif
         </div>
     </form>

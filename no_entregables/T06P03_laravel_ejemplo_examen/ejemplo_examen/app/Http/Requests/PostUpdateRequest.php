@@ -17,8 +17,8 @@ class PostUpdateRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'extract' => ['string', 'max:255'],
-            'content' => ['required', 'string'],
+            'extract' => ['nullable', 'string', 'max:255'],
+            'content' => ['required', 'string', 'max:16777215'],
             'expirable' => ['boolean'],
             'commentable' => ['boolean'],
             'access' => ['required', 'string', 'lowercase'],
