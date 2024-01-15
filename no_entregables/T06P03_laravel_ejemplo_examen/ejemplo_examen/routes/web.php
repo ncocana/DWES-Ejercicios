@@ -35,4 +35,4 @@ Route::post('/language-switch', [LanguageController::class, 'languageSwitch'])->
 
 Route::get('/form', function () {
     return view('form.index');
-})->middleware(['auth', 'verified'])->name('form');
+})->middleware(['auth', 'verified'])->name('form.index');
