@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,3 +37,7 @@ Route::post('/language-switch', [LanguageController::class, 'languageSwitch'])->
 Route::get('/form', function () {
     return view('form.index');
 })->middleware(['auth', 'verified'])->name('form.index');
+
+Route::resource('posts', PostController::class)
+    ->only(['index', 'store', 'edit'])
+    ->middleware(['auth', 'verified']);
