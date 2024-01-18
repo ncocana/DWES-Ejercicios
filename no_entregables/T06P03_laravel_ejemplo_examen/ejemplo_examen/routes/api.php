@@ -19,8 +19,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::prefix('api')->group(function () {
-    Route::resource('posts', ApiPostController::class)
-        ->only(['update', 'destroy'])
-        ->middleware(['auth', 'verified']);
-});
+// Update Post
+Route::put('posts/{post}', [ApiPostController::class, 'update']);
+
+// Delete Post
+Route::delete('posts/{post}', [ApiPostController::class, 'destroy']);

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostUpdateRequest;
 use App\Models\Post;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ApiPostController extends Controller
@@ -11,26 +12,35 @@ class ApiPostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Post $post): RedirectResponse
+    public function update(PostUpdateRequest $request, Post $post): JsonResponse
     {
-        $this->authorize('update', $post);
- 
-        $validated = $request->user()->fill($request->validated());
+        // $this->authorize('update', $post);
+        // dd('Reached update method');
+
+        $validated = $request->validated();
+
+        $post->commentable = $request->input('commentable') ? true : false;
+        $post->expirable = $request->input('expirable') ? true : false;
 
         $post->update($validated);
 
-        return redirect(route('posts.index'));
+        return response()->json([
+            'data' => $post,
+            'message' => 'Post has been updated'
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post): RedirectResponse
+    public function destroy(Post $post): JsonResponse
     {
-        $this->authorize('delete', $post);
+        // $this->authorize('delete', $post);
  
         $post->delete();
  
-        return redirect(route('posts.index'));
+        return response()->json([
+            'message' => 'Post has been deleted'
+        ]);
     }
 }
