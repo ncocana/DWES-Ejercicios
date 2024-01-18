@@ -6,6 +6,8 @@ use App\Http\Requests\PostUpdateRequest;
 use App\Models\Post;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class PostController extends Controller
@@ -15,8 +17,19 @@ class PostController extends Controller
      */
     public function index(): View
     {
+        // Get the authenticated user
+        $user = Auth::user();
+
+        // Fetch only posts that belong to the authorized user
+        $posts = $user->posts()->with('user')->latest()->get();
+
+        // Authorize the action for each post using the gate
+        foreach ($posts as $post) {
+            Gate::authorize('show-user-post', $post);
+        }
+
         return view('form.index', [
-            'posts' => Post::with('user')->latest()->get(),
+            'posts' => $posts,
         ]);
     }
 

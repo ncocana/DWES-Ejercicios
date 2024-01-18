@@ -23,6 +23,15 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
             ]);
+        
+        // Usuario alternativo.
+        User::factory()
+        ->create([
+            'name' => 'ncocana2',
+            'email' => 'ncocana2@cifpfbmoll.eu',
+            'email_verified_at' => now(),
+            'remember_token' => Str::random(10),
+        ]);
 
     }
 }
