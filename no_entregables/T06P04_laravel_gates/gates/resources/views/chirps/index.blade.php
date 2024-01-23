@@ -8,7 +8,9 @@
                 class="block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
             >{{ old('message') }}</textarea>
             <x-input-error :messages="$errors->get('message')" class="mt-2" />
-            <x-primary-button class="mt-4">{{ __('Chirp') }}</x-primary-button>
+            @if ((Request::user()->role_name!=='Invitado'))
+                <x-primary-button class="mt-4">{{ __('Chirp') }}</x-primary-button>
+            @endif
         </form>
  
         <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
@@ -26,7 +28,7 @@
                                     <small class="text-sm text-gray-600"> &middot; {{ __('edited') }}</small>
                                 @endunless
                             </div>
-                            @if ($chirp->user->is(auth()->user()))
+                            @if ($chirp->user->is(auth()->user()) || Request::user()->role_name==='Super')
                                 <x-dropdown>
                                     <x-slot name="trigger">
                                         <button>
