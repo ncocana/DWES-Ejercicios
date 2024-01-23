@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\Post;
+use App\Models\Chirp;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -25,9 +25,22 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        // Devuelve true si el autor del post es el usuario autenticado
-        Gate::define('show-user-post', function (User $user, Post $post) {
-            return $user->id === $post->user_id;
+        Gate::define('create-chirp', function (User $user, Chirp $chirp) {
+            if ($user->role_name !== "Invitado") {
+                return $user->id === $chirp->user_id;
+            }
+        });
+
+        Gate::define('edit-chirp', function (User $user, Chirp $chirp) {
+            if ($user->role_name !== "Invitado") {
+                return $user->id === $chirp->user_id;
+            }
+        });
+
+        Gate::define('delete-chirp', function (User $user, Chirp $chirp) {
+            if ($user->role_name !== "Invitado") {
+                return $user->id === $chirp->user_id;
+            }
         });
     }
 }
