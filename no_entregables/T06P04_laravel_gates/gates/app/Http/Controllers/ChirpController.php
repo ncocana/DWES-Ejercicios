@@ -58,11 +58,15 @@ class ChirpController extends Controller
      */
     public function edit(Chirp $chirp): View
     {
-        $this->authorize('update', $chirp);
+        // $this->authorize('update', $chirp);
 
-        return view('chirps.edit', [
-            'chirp' => $chirp,
-        ]);
+        if (Gate::allows('edit-chirp')) {
+            return view('chirps.edit', [
+                'chirp' => $chirp,
+            ]);
+        } else {
+            Abort(403);
+        }
     }
 
     /**
@@ -71,12 +75,16 @@ class ChirpController extends Controller
     public function update(ChirpRequest $request, Chirp $chirp): RedirectResponse
     {
         // $this->authorize('update', $chirp);
- 
-        $validated = $request->validated();
- 
-        $chirp->update($validated);
- 
-        return redirect(route('chirps.index'));
+
+        if (Gate::allows('edit-chirp')) {
+            $validated = $request->validated();
+    
+            $chirp->update($validated);
+    
+            return redirect(route('chirps.index'));
+        } else {
+            Abort(403);
+        }
     }
 
     /**
@@ -84,10 +92,14 @@ class ChirpController extends Controller
      */
     public function destroy(Chirp $chirp): RedirectResponse
     {
-        $this->authorize('delete', $chirp);
+        // $this->authorize('delete', $chirp);
  
-        $chirp->delete();
- 
-        return redirect(route('chirps.index'));
+        if (Gate::allows('delete-chirp')) {
+            $chirp->delete();
+    
+            return redirect(route('chirps.index'));
+        } else {
+            Abort(403);
+        }
     }
 }

@@ -11,8 +11,10 @@ class ChirpRequest extends FormRequest
     public function authorize(): bool
     {
         // v-auth-2.1
-        return Gate::allows('create-chirp');
-        // podemos acceder al usuario con $this->user()
+        // return Gate::allows('create-chirp');
+
+        // v-auth-2.2
+        return true;
     }
     
     /**
