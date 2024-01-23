@@ -25,22 +25,16 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Gate::define('create-chirp', function (User $user, Chirp $chirp) {
-            if ($user->role_name !== "Invitado") {
-                return $user->id === $chirp->user_id;
-            }
+        Gate::define('create-chirp', function (User $user) {
+            return $user->role_name !== "Invitado";
         });
 
-        Gate::define('edit-chirp', function (User $user, Chirp $chirp) {
-            if ($user->role_name !== "Invitado") {
-                return $user->id === $chirp->user_id;
-            }
+        Gate::define('edit-chirp', function (User $user) {
+            return $user->role_name !== "Invitado";
         });
 
-        Gate::define('delete-chirp', function (User $user, Chirp $chirp) {
-            if ($user->role_name !== "Invitado") {
-                return $user->id === $chirp->user_id;
-            }
+        Gate::define('delete-chirp', function (User $user) {
+            return $user->role_name !== "Invitado";
         });
     }
 }
