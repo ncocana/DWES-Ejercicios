@@ -60,7 +60,7 @@ class ChirpController extends Controller
     {
         // $this->authorize('update', $chirp);
 
-        if (Gate::allows('edit-chirp')) {
+        if (Gate::allows('edit-chirp', $chirp)) {
             return view('chirps.edit', [
                 'chirp' => $chirp,
             ]);
@@ -76,7 +76,7 @@ class ChirpController extends Controller
     {
         // $this->authorize('update', $chirp);
 
-        if (Gate::allows('edit-chirp')) {
+        if (Gate::allows('edit-chirp', $chirp)) {
             $validated = $request->validated();
     
             $chirp->update($validated);
@@ -94,7 +94,7 @@ class ChirpController extends Controller
     {
         // $this->authorize('delete', $chirp);
  
-        if (Gate::allows('delete-chirp')) {
+        if (Gate::allows('delete-chirp', $chirp)) {
             $chirp->delete();
     
             return redirect(route('chirps.index'));
