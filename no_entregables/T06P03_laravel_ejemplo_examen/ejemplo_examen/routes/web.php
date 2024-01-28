@@ -39,5 +39,5 @@ Route::post('/language-switch', [LanguageController::class, 'languageSwitch'])->
 // })->middleware(['auth', 'verified'])->name('form.index');
 
 Route::resource('posts', PostController::class)
-    ->only(['index', 'store', 'edit'])
+    ->only(['index', 'create', 'store', 'edit', 'update', 'destroy'])
     ->middleware(['auth', 'verified']);

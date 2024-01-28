@@ -29,5 +29,15 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('show-user-post', function (User $user, Post $post) {
             return $user->id === $post->user_id;
         });
+
+        // Devuelve true si el autor del post es el usuario autenticado
+        Gate::define('update-post', function (User $user, Post $post) {
+            return $user->id === $post->user_id;
+        });
+
+        // Devuelve true si el autor del post es el usuario autenticado
+        Gate::define('delete-post', function (User $user, Post $post) {
+            return $user->id === $post->user_id;
+        });
     }
 }

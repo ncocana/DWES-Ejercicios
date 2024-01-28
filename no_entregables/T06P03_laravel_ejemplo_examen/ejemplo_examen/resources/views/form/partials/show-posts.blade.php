@@ -11,8 +11,37 @@
                                 <header class="mb-4">
                                     <!-- Post title-->
                                     <h1 class="fw-bolder mb-1">{{ $post->title }}</h1>
+                                    @if ($post->user->is(auth()->user()))
+                                        <x-dropdown>
+                                            <x-slot name="trigger">
+                                                <button>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+                                                    </svg>
+                                                </button>
+                                            </x-slot>
+                                            <x-slot name="content">
+                                                <x-dropdown-link :href="route('posts.edit', $post)">
+                                                    {{ __('Edit') }}
+                                                </x-dropdown-link>
+                                                <form method="POST" action="{{ route('posts.destroy', $post) }}">
+                                                    @csrf
+                                                    @method('delete')
+                                                    <x-dropdown-link :href="route('posts.destroy', $post)" onclick="event.preventDefault(); this.closest('form').submit();">
+                                                        {{ __('Delete') }}
+                                                    </x-dropdown-link>
+                                                </form>
+                                            </x-slot>
+                                        </x-dropdown>
+                                    @endif
                                     <!-- Post meta content-->
-                                    <div class="text-muted fst-italic mb-2">{{ __('Posted on')}} {{ $post->created_at->translatedFormat(__('posts-form.date_format')) }} {{ __('by') }} {{ $post->user->name }}</div>
+                                    <div class="text-muted fst-italic mb-2">
+                                        {{ __('Posted on')}} {{ $post->created_at->translatedFormat(__('posts-form.date_format')) }} {{ __('by') }} {{ $post->user->name }}
+                                        
+                                        @unless ($post->created_at->eq($post->updated_at))
+                                            <small class="text-sm text-gray-600"> &middot; {{ __('edited') }}</small>
+                                        @endunless
+                                    </div>
                                     <!-- Post extract-->
                                     <p class="text-md text-muted font-weight-bold">{{ $post->extract }}</p>
                                 </header>

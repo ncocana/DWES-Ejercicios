@@ -36,9 +36,9 @@ class PostController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View
     {
-        //
+        return view('form.create');
     }
 
     /**
@@ -73,10 +73,39 @@ class PostController extends Controller
      */
     public function edit(Post $post): View
     {
-        $this->authorize('update', $post);
+        $this->authorize('update-post', $post);
 
         return view('form.edit', [
             'post' => $post,
         ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(PostUpdateRequest $request, Post $post): RedirectResponse
+    {
+        $this->authorize('update-post', $post);
+ 
+        $validated = $request->validated();
+
+        $post->commentable = $request->input('commentable') ? true : false;
+        $post->expirable = $request->input('expirable') ? true : false;
+ 
+        $post->update($validated);
+ 
+        return redirect(route('posts.index'));
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Post $post): RedirectResponse
+    {
+        $this->authorize('delete-post', $post);
+ 
+        $post->delete();
+ 
+        return redirect(route('posts.index'));
     }
 }
