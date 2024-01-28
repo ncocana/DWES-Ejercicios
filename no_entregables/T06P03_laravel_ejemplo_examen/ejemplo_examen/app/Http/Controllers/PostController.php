@@ -18,15 +18,18 @@ class PostController extends Controller
     public function index(): View
     {
         // Get the authenticated user
-        $user = Auth::user();
+        // $user = Auth::user();
 
         // Fetch only posts that belong to the authorized user
-        $posts = $user->posts()->with('user')->latest()->get();
+        // $posts = $user->posts()->with('user')->latest()->get();
 
         // Authorize the action for each post using the gate
-        foreach ($posts as $post) {
-            Gate::authorize('show-user-post', $post);
-        }
+        // foreach ($posts as $post) {
+        //     Gate::authorize('show-user-post', $post);
+        // }
+
+        // Fetch all posts
+        $posts = Post::with('user')->latest()->get();
 
         return view('form.index', [
             'posts' => $posts,

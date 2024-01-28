@@ -14,10 +14,10 @@
             </p>
         </div>
         
-        <a href="{{ route('posts.create') }}" >
+        <a href="{{ route('posts.create') }}" class="pl-2">
             <button class="btn btn-primary">{{ __('Create publication') }}</button>
         </a>
 
-        @include('form.partials.show-posts')
+        @include('form.show-posts')
     </div>
 @endsection
