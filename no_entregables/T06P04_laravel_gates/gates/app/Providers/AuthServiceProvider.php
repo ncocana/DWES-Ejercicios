@@ -30,11 +30,11 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('edit-chirp', function (User $user, Chirp $chirp) {
-            return $user->role_name !== "Invitado" || ($user->role_name === "Admin" && $chirp->user_id == $user->id);
+            return $user->role_name !== "Invitado" || ($user->role_name === "Super" && $chirp->user_id == $user->id);
         });
 
         Gate::define('delete-chirp', function (User $user, Chirp $chirp) {
-            return $user->role_name !== "Invitado" || ($user->role_name === "Admin" && $chirp->user_id == $user->id);
+            return $user->role_name !== "Invitado" || ($user->role_name === "Super" && $chirp->user_id == $user->id);
         });
     }
 }

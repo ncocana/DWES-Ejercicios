@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
         User::factory()
             ->create([
                 'name' => 'Super',
-                'email' => 'ncocana@cifpfbmoll.eu',
+                'email' => 'super@cifpfbmoll.eu',
                 'email_verified_at' => now(),
                 'role_name' => "Super",
                 'remember_token' => Str::random(10),
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
         User::factory()
             ->create([
                 'name' => 'Admin',
-                'email' => 'ncocana2@cifpfbmoll.eu',
+                'email' => 'admin@cifpfbmoll.eu',
                 'email_verified_at' => now(),
                 'role_name' => "Admin",
                 'remember_token' => Str::random(10),
@@ -39,7 +39,7 @@ class UserSeeder extends Seeder
         User::factory()
             ->create([
                 'name' => 'Propietario',
-                'email' => 'ncocana3@cifpfbmoll.eu',
+                'email' => 'propietario@cifpfbmoll.eu',
                 'email_verified_at' => now(),
                 'role_name' => "Propietario",
                 'remember_token' => Str::random(10),
@@ -48,7 +48,7 @@ class UserSeeder extends Seeder
         User::factory()
             ->create([
                 'name' => 'Invitado',
-                'email' => 'ncocana4@cifpfbmoll.eu',
+                'email' => 'invitado@cifpfbmoll.eu',
                 'email_verified_at' => now(),
                 'role_name' => "Invitado",
                 'remember_token' => Str::random(10),
