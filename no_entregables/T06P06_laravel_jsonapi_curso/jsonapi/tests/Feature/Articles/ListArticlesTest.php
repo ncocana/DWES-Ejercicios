@@ -10,6 +10,7 @@ use Tests\TestCase;
 class ListArticlesTest extends TestCase
 {
     use RefreshDatabase;
+    
     /** @test */
     public function can_fetch_a_single_article(): void
     {
