@@ -7,6 +7,7 @@ use App\Http\Resources\ArticleCollection;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class ArticleController extends Controller
 {
@@ -57,5 +58,11 @@ class ArticleController extends Controller
         ]);
 
         return ArticleResource::make($article);
+    }
+
+    public function destroy(Article $article): Response
+    {
+        $article->delete();
+        return response()->noContent();
     }
 }
