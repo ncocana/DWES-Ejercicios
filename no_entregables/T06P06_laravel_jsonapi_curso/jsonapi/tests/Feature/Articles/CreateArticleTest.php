@@ -101,9 +101,10 @@ class CreateArticleTest extends TestCase
     {
         $article= Article::factory()->create();
 
+        // Probamos guardar un artículo con un 'slug' existente.
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo artículo',
-            'slug' => $article->slug,  // Probamos guardar un artículo con un 'slug' existente.
+            'slug' => $article->slug,
             'content' => 'Contenido del artículo'
         ])->assertJsonApiValidationErrors('slug');
     }
@@ -111,9 +112,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function slug_only_must_contain_numbers_letters_and_dashes()
     {
+        // Caracteres no permitidos.
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo artículo',
-            'slug' => '$%^&',  // Caracteres no permitidos.
+            'slug' => '$%^&',
             'content' => 'Contenido del artículo'
         ])->dump()->assertJsonApiValidationErrors('slug');
     }
@@ -121,9 +123,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function slug_must_not_contain_underscores()
     {
+        // Guion bajo no está permitido.
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo artículo',
-            'slug' => 'with_underscore',  // Guion bajo no está permitido.
+            'slug' => 'with_underscore',
             'content' => 'Contenido del artículo'
         ])->assertJsonApiValidationErrors('slug');
     }
@@ -131,9 +134,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function slug_must_not_start_with_dashes()
     {
+        // Guion al principio no está permitido.
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo artículo',
-            'slug' => '-start-with-dashes',  // Guion bajo no está permitido.
+            'slug' => '-start-with-dashes',
             'content' => 'Contenido del artículo'
         ])->assertJsonApiValidationErrors('slug');
     }
@@ -141,9 +145,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function slug_must_not_end_with_dashes()
     {
+        // Guion al final no está permitido.
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo artículo',
-            'slug' => 'start-with-dashes-',  // Guion bajo no está permitido.
+            'slug' => 'end-with-dashes-',
             'content' => 'Contenido del artículo'
         ])->assertJsonApiValidationErrors('slug');
     }

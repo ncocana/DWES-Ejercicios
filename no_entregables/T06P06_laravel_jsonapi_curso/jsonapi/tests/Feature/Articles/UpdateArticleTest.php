@@ -82,9 +82,10 @@ class UpdateArticleTest extends TestCase
         $article1 = Article::factory()->create();
         $article2 = Article::factory()->create();
 
+        // Probamos guardar un artículo con un 'slug' existente.
         $this->patchJson(route('api.v1.articles.update', $article1), [
             'title' => 'Nuevo artículo',
-            'slug' => $article2->slug,  // Probamos guardar un artículo con un 'slug' existente.
+            'slug' => $article2->slug,
             'content' => 'Contenido del artículo'
         ])->assertJsonApiValidationErrors('slug');
     }
@@ -94,9 +95,10 @@ class UpdateArticleTest extends TestCase
     {
         $article = Article::factory()->create();
 
+        // Caracteres no permitidos.
         $this->patchJson(route('api.v1.articles.update', $article), [
             'title' => 'Nuevo artículo',
-            'slug' => '$%^&',  // Caracteres no permitidos.
+            'slug' => '$%^&',
             'content' => 'Contenido del artículo'
         ])->assertJsonApiValidationErrors('slug');
     }
@@ -106,9 +108,10 @@ class UpdateArticleTest extends TestCase
     {
         $article = Article::factory()->create();
 
+        // Guion bajo no está permitido.
         $this->patchJson(route('api.v1.articles.update', $article), [
             'title' => 'Nuevo artículo',
-            'slug' => 'with_underscore',  // Guion bajo no está permitido.
+            'slug' => 'with_underscore',
             'content' => 'Contenido del artículo'
         ])->assertJsonApiValidationErrors('slug');
     }
@@ -118,9 +121,10 @@ class UpdateArticleTest extends TestCase
     {
         $article = Article::factory()->create();
 
+        // Guion al principio no está permitido.
         $this->patchJson(route('api.v1.articles.update', $article), [
             'title' => 'Nuevo artículo',
-            'slug' => '-start-with-dashes',  // Guion bajo no está permitido.
+            'slug' => '-start-with-dashes',
             'content' => 'Contenido del artículo'
         ])->assertJsonApiValidationErrors('slug');
     }
@@ -130,9 +134,10 @@ class UpdateArticleTest extends TestCase
     {
         $article = Article::factory()->create();
 
+        // Guion al final no está permitido.
         $this->patchJson(route('api.v1.articles.update', $article), [
             'title' => 'Nuevo artículo',
-            'slug' => 'start-with-dashes-',  // Guion bajo no está permitido.
+            'slug' => 'end-with-dashes-',
             'content' => 'Contenido del artículo'
         ])->assertJsonApiValidationErrors('slug');
     }

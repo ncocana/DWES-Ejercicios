@@ -6,7 +6,7 @@ use App\Rules\Slug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ArticleRequest extends FormRequest
+class SaveArticleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,9 +27,14 @@ class ArticleRequest extends FormRequest
             'data.attributes.title' => ['required', 'min:4'],
             'data.attributes.slug' => [
                 'required',
-                new Slug,
+                new Slug(),
                 Rule::unique('articles', 'slug')->ignore($this->route('article'))],
             'data.attributes.content' => ['required'],
         ];
+    }
+
+    public function validated($key = null, $default = null)
+    {
+        return parent::validated()['data']['attributes'];
     }
 }
