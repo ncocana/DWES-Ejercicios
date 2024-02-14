@@ -18,7 +18,7 @@ class UpdateArticleTest extends TestCase
 
         $response = $this->patchJson(route('api.v1.articles.update', $article), [
             'title' => 'Updated Article',
-            'slug' => 'updated-articulo',
+            'slug' => $article->slug,
             'content' => 'Updated content'
         ])->assertOk();
 
@@ -33,13 +33,13 @@ class UpdateArticleTest extends TestCase
                 'id' => (string) $article->getRouteKey(),
                 'attributes' => [
                     'title' => 'Updated Article',
-                    'slug' => 'updated-articulo',
-                    'content' => 'Updated content'
+                    'slug' => $article->slug,
+                    'content' => 'Updated content',
                 ],
                 'links' => [
                     'self' => route('api.v1.articles.show', $article)
                 ]
-            ]
+            ],
         ]);
     }
     
@@ -73,6 +73,67 @@ class UpdateArticleTest extends TestCase
         $this->patchJson(route('api.v1.articles.update', $article), [
             'title' => 'Updated Article',
             'content' => 'Updated content'
+        ])->assertJsonApiValidationErrors('slug');
+    }
+
+    /** @test */
+    public function slug_must_be_unique()
+    {
+        $article1 = Article::factory()->create();
+        $article2 = Article::factory()->create();
+
+        $this->patchJson(route('api.v1.articles.update', $article1), [
+            'title' => 'Nuevo artículo',
+            'slug' => $article2->slug,  // Probamos guardar un artículo con un 'slug' existente.
+            'content' => 'Contenido del artículo'
+        ])->assertJsonApiValidationErrors('slug');
+    }
+
+    /** @test */
+    public function slug_only_must_contain_numbers_letters_and_dashes()
+    {
+        $article = Article::factory()->create();
+
+        $this->patchJson(route('api.v1.articles.update', $article), [
+            'title' => 'Nuevo artículo',
+            'slug' => '$%^&',  // Caracteres no permitidos.
+            'content' => 'Contenido del artículo'
+        ])->assertJsonApiValidationErrors('slug');
+    }
+
+    /** @test */
+    public function slug_must_not_contain_underscores()
+    {
+        $article = Article::factory()->create();
+
+        $this->patchJson(route('api.v1.articles.update', $article), [
+            'title' => 'Nuevo artículo',
+            'slug' => 'with_underscore',  // Guion bajo no está permitido.
+            'content' => 'Contenido del artículo'
+        ])->assertJsonApiValidationErrors('slug');
+    }
+
+    /** @test */
+    public function slug_must_not_start_with_dashes()
+    {
+        $article = Article::factory()->create();
+
+        $this->patchJson(route('api.v1.articles.update', $article), [
+            'title' => 'Nuevo artículo',
+            'slug' => '-start-with-dashes',  // Guion bajo no está permitido.
+            'content' => 'Contenido del artículo'
+        ])->assertJsonApiValidationErrors('slug');
+    }
+
+    /** @test */
+    public function slug_must_not_end_with_dashes()
+    {
+        $article = Article::factory()->create();
+
+        $this->patchJson(route('api.v1.articles.update', $article), [
+            'title' => 'Nuevo artículo',
+            'slug' => 'start-with-dashes-',  // Guion bajo no está permitido.
+            'content' => 'Contenido del artículo'
         ])->assertJsonApiValidationErrors('slug');
     }
 

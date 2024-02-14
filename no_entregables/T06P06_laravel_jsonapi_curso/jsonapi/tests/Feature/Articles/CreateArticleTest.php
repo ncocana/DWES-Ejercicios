@@ -57,14 +57,14 @@ class CreateArticleTest extends TestCase
                 'type' => 'articles',
                 'id' => (string) $article->getRouteKey(),
                 'attributes' => [
-                    'title' => 'Nuevo artículo',
-                    'slug' => 'nuevo-articulo',
-                    'content' => 'Contenido del artículo'
+                    'title' => (string) $article->title,
+                    'slug' => $article->slug,
+                    'content' => $article->content,
                 ],
                 'links' => [
                     'self' => route('api.v1.articles.show', $article)
                 ]
-            ]
+            ],
         ]);
     }
 
@@ -92,6 +92,58 @@ class CreateArticleTest extends TestCase
     {
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo Artículo',
+            'content' => 'Contenido del artículo'
+        ])->assertJsonApiValidationErrors('slug');
+    }
+
+    /** @test */
+    public function slug_must_be_unique()
+    {
+        $article= Article::factory()->create();
+
+        $this->postJson(route('api.v1.articles.store'), [
+            'title' => 'Nuevo artículo',
+            'slug' => $article->slug,  // Probamos guardar un artículo con un 'slug' existente.
+            'content' => 'Contenido del artículo'
+        ])->assertJsonApiValidationErrors('slug');
+    }
+
+    /** @test */
+    public function slug_only_must_contain_numbers_letters_and_dashes()
+    {
+        $this->postJson(route('api.v1.articles.store'), [
+            'title' => 'Nuevo artículo',
+            'slug' => '$%^&',  // Caracteres no permitidos.
+            'content' => 'Contenido del artículo'
+        ])->dump()->assertJsonApiValidationErrors('slug');
+    }
+
+    /** @test */
+    public function slug_must_not_contain_underscores()
+    {
+        $this->postJson(route('api.v1.articles.store'), [
+            'title' => 'Nuevo artículo',
+            'slug' => 'with_underscore',  // Guion bajo no está permitido.
+            'content' => 'Contenido del artículo'
+        ])->assertJsonApiValidationErrors('slug');
+    }
+
+    /** @test */
+    public function slug_must_not_start_with_dashes()
+    {
+        $this->postJson(route('api.v1.articles.store'), [
+            'title' => 'Nuevo artículo',
+            'slug' => '-start-with-dashes',  // Guion bajo no está permitido.
+            'content' => 'Contenido del artículo'
+        ])->assertJsonApiValidationErrors('slug');
+    }
+
+    /** @test */
+    public function slug_must_not_end_with_dashes()
+    {
+        $this->postJson(route('api.v1.articles.store'), [
+            'title' => 'Nuevo artículo',
+            'slug' => 'start-with-dashes-',  // Guion bajo no está permitido.
             'content' => 'Contenido del artículo'
         ])->assertJsonApiValidationErrors('slug');
     }
