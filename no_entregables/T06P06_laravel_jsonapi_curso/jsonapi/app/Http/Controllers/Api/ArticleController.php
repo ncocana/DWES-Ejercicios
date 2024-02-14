@@ -18,19 +18,36 @@ class ArticleController extends Controller
         // Return all items
         // $articles = Article::all();
 
-        // Sort by order
-        $sortField = $request->input('sort');
-        
-        // $sortDirection = 'asc';
-        // if (Str::of($sortField)->startsWith('-')) {
-        //     $sortDirection = 'desc';
-        // }
-        $sortDirection = Str::of($sortField)->startsWith('-') ? 'desc' : 'asc';
-        $sortField = ltrim($sortField, '-');
+        // Sort by order - Multiple fields
+        $articles = Article::query();
 
-        $articles = Article::orderBy($sortField, $sortDirection)->get();
+        if ($request->filled('sort')) {
 
-        return ArticleCollection::make($articles);
+            // Sort by order - Single field
+            // $sortField = $request->input('sort');
+            
+            // $sortDirection = 'asc';
+            // if (Str::of($sortField)->startsWith('-')) {
+            //     $sortDirection = 'desc';
+            // }
+    
+            // $articles = Article::orderBy($sortField, $sortDirection)->get();
+            // return ArticleCollection::make($articles);
+            
+            $sortFields = explode(',', $request->input('sort'));
+            $allowedSorts = ['title', 'content'];
+    
+            foreach ($sortFields as $sortField) {
+                $sortDirection = Str::of($sortField)->startsWith('-') ? 'desc' : 'asc';
+                $sortField = ltrim($sortField, '-');
+                
+                abort_unless(in_array($sortField, $allowedSorts), 400);
+    
+                $articles->orderBy($sortField, $sortDirection);
+            }
+        }
+
+        return ArticleCollection::make($articles->get());
     }
 
     public function show(Article $article): ArticleResource
