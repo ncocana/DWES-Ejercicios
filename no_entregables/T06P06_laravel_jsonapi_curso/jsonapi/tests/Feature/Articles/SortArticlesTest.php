@@ -84,7 +84,7 @@ class SortArticlesTest extends TestCase
     }
     
     /** @test */
-    public function can_sort_articles_by_title_ascending_and_content_descending(): void
+    public function can_sort_articles_by_title_and_content(): void
     {
         Article::factory()->create([
             'title' => 'A title',
@@ -108,25 +108,8 @@ class SortArticlesTest extends TestCase
             'A content',
             'B content',
         ]);
-    }
-    
-    /** @test */
-    public function can_sort_articles_by_title_and_content(): void
-    {
-        Article::factory()->create([
-            'title' => 'A title',
-            'content' => 'A content'
-        ]);
-        Article::factory()->create([
-            'title' => 'B title',
-            'content' => 'B content'
-        ]);
-        Article::factory()->create([
-            'title' => 'A title',
-            'content' => 'C content'
-        ]);
 
-        // Query Sort = "/articles?sort=title,-content"
+        // Query Sort = "/articles?sort=title,content"
         $url = route('api.v1.articles.index', ['sort' => 'title,content']);
         // dd($url);
         
