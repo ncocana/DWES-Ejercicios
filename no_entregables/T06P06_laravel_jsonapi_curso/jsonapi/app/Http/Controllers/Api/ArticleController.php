@@ -9,12 +9,26 @@ use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 
 class ArticleController extends Controller
 {
-    public function index(): ArticleCollection
+    public function index(Request $request): ArticleCollection
     {
-        $articles = Article::all();
+        // Return all items
+        // $articles = Article::all();
+
+        // Sort by order
+        $sortField = $request->input('sort');
+        
+        // $sortDirection = 'asc';
+        // if (Str::of($sortField)->startsWith('-')) {
+        //     $sortDirection = 'desc';
+        // }
+        $sortDirection = Str::of($sortField)->startsWith('-') ? 'desc' : 'asc';
+        $sortField = ltrim($sortField, '-');
+
+        $articles = Article::orderBy($sortField, $sortDirection)->get();
 
         return ArticleCollection::make($articles);
     }
