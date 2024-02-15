@@ -12,28 +12,6 @@ class CreateArticleTest extends TestCase
 {
     use RefreshDatabase;
 
-    // Macro in setUp()
-    // protected function setUp(): void
-    // {
-    //     parent::setUp();
-
-    //     TestResponse::macro(
-    //         'assertJsonApiValidationErrors',
-    //         function($attribute) {
-    //             /** @var TestResponse $this */
-    //             $this->assertJsonStructure([
-    //                 'errors' => [
-    //                     ['title', 'detail', 'source' => ['pointer']]
-    //                 ]
-    //             ])->assertJsonFragment([
-    //                 'source' => ['pointer' => "/data/attributes/{$attribute}"]
-    //             ])->assertHeader(
-    //                 'content-type', 'application/vnd.api+json'
-    //             )->assertStatus(422);
-    //         }
-    //     );
-    // }
-
     /** @test */
     public function can_create_articles(): void
     {
@@ -117,7 +95,7 @@ class CreateArticleTest extends TestCase
             'title' => 'Nuevo artículo',
             'slug' => '$%^&',
             'content' => 'Contenido del artículo'
-        ])->dump()->assertJsonApiValidationErrors('slug');
+        ])->assertJsonApiValidationErrors('slug');
     }
 
     /** @test */
