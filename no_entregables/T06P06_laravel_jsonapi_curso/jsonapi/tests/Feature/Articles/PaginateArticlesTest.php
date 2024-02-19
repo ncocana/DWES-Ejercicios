@@ -17,10 +17,12 @@ class PaginateArticlesTest extends TestCase
         $articles = Article::factory(6)->create();
 
         // Route: "/api/v1/articles?page[size]=2&page[number]=2"
-        $url = route('api.v1.articles.index', ['page' => [
-            'size' => 2,
-            'number' => 2
-        ]]);
+        $url = route('api.v1.articles.index', [
+            'page' => [
+                'size' => 2,
+                'number' => 2
+            ]
+        ]);
         // dd(urldecode($url));
 
         $response = $this->getJson($url);
