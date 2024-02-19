@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\ArticleController;
+use App\Http\Controllers\Api\LoginController;
+use App\Http\Middleware\ValidateJsonApiDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,4 +21,9 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+Route::withoutMiddleware(ValidateJsonApiDocument::class)
+    ->post('login', LoginController::class)
+    ->name('api.v1.login');
+
 Route::apiResource('articles', ArticleController::class)->names('api.v1.articles');
+// Route::middleware('auth:sanctum')->apiResource('articles', ArticleController::class)->names('api.v1.articles');
