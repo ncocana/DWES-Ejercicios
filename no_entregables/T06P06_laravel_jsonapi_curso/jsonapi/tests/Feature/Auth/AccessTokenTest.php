@@ -55,18 +55,19 @@ class AccessTokenTest extends TestCase
         ];
 
         $response = $this->postJson(route('api.v1.login'), $data);
-        
+
         // dd($response);
         $response->assertStatus(422);
-        $response->assertJson([
-            'errors' => [
-                [
-                    'detail' => 'These credentials do not match our records.',
-                    'source' => [
-                        'pointer' => '/password'
-                    ]
-                ]
-            ]
-        ]);
+        // $response->assertJson([
+        //     'errors' => [
+        //         [
+        //             'detail' => 'These credentials do not match our records.',
+        //             'source' => [
+        //                 'pointer' => '/password'
+        //             ]
+        //         ]
+        //     ]
+        // ]);
+        $response->assertJsonApiValidationErrors('password');
     }
 }

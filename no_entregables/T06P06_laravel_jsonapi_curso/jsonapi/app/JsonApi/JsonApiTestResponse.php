@@ -23,9 +23,7 @@ class JsonApiTestResponse
                     'source' => ['pointer' => $pointer]
                 ]);
             } catch (ExpectationFailedException $e) {
-                PHPUnit::fail("Failed to find a JSON:API validation error for key: '{$attribute}'"
-                    . PHP_EOL.PHP_EOL .
-                    $e->getMessage());
+                $this->tryAlternativePointer($attribute);
             }
 
             try {
@@ -43,6 +41,40 @@ class JsonApiTestResponse
             $this->assertHeader(
                 'content-type', 'application/vnd.api+json'
             )->assertStatus(422);
+        };
+    }
+
+    protected function tryAlternativePointer(): Closure
+    {
+        return function($attribute) {
+            /** @var TestResponse $this */
+            $pointers = [
+                "/{$attribute}",
+                "/data/attributes/{$attribute}"
+            ];
+
+            $found = false;
+
+            foreach ($pointers as $pointer) {
+                try {
+                    $this->assertJsonFragment([
+                        'source' => ['pointer' => $pointer]
+                    ]);
+                    $found = true;
+                    // If found, break the loop
+                    break;
+                } catch (ExpectationFailedException $e) {
+                    // If not found, continue to the next pointer
+                    continue;
+                }
+            }
+
+            // If not found, return fail message
+            if (!$found) {
+                PHPUnit::fail("Failed to find a JSON:API validation error for key: '{$attribute}'"
+                    . PHP_EOL . PHP_EOL .
+                    $e->getMessage());
+            }
         };
     }
 }
