@@ -25,5 +25,5 @@ Route::withoutMiddleware(ValidateJsonApiDocument::class)
     ->post('login', LoginController::class)
     ->name('api.v1.login');
 
-Route::apiResource('articles', ArticleController::class)->names('api.v1.articles');
-// Route::middleware('auth:sanctum')->apiResource('articles', ArticleController::class)->names('api.v1.articles');
+// Route::apiResource('articles', ArticleController::class)->names('api.v1.articles');
+Route::middleware('auth:sanctum')->apiResource('articles', ArticleController::class)->names('api.v1.articles');

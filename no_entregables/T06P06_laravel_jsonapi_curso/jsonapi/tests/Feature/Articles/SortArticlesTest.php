@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Articles;
 
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
 use App\Models\Article;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -10,6 +12,15 @@ use Tests\TestCase;
 class SortArticlesTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+    }
     
     /** @test */
     public function can_sort_articles_by_title(): void
