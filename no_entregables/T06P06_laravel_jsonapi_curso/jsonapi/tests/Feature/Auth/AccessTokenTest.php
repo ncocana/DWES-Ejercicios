@@ -11,16 +11,28 @@ class AccessTokenTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected $user;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Creating and authenticating a user
+        $this->user = User::factory()->create([
+            'email' => 'example@example.com'
+        ]);
+    }
+
     /** @test */
     public function can_issue_access_token(): void
     {
         $this->withoutJsonApiDocumentFormatting();
 
-        $user = User::factory()->create();
-
-        $data = $this->validCredentials([
-            'email' => $user->email,
-        ]);
+        $data = [
+            'email' => $this->user->email,
+            'password' => 'password',
+            'device_name' => 'My device',
+        ];
 
         $response = $this->postJson(route('api.v1.login'), $data);
 
@@ -28,32 +40,33 @@ class AccessTokenTest extends TestCase
 
         $dbToken = PersonalAccessToken::findToken($token);
 
-        $this->assertTrue($dbToken->tokenable->is($user));
+        $this->assertTrue($dbToken->tokenable->is($this->user));
     }
 
     /** @test */
-    // public function password_must_be_valid(): void
-    // {
-    //     $this->withoutJsonApiDocumentFormatting();
-
-    //     $user = User::factory()->create();
-
-    //     $data = $this->validCredentials([
-    //         'email' => $user->email,
-    //         'password' => 'incorrect',
-    //     ]);
-
-    //     $response = $this->postJson(route('api.v1.login'), $data);
-    //     // dd($response);
-    //     $response->assertJsonValidationErrorFor('password');
-    // }
-
-    protected function validCredentials(mixed $overrides = []): array
+    public function password_must_be_valid(): void
     {
-        return array_merge([
-            'email' => 'ncocana@cifpfbmoll.eu',
-            'password' => 'password',
+        $this->withoutJsonApiDocumentFormatting();
+
+        $data = [
+            'email' => $this->user->email,
+            'password' => 'incorrect',
             'device_name' => 'My device',
-        ], $overrides);
+        ];
+
+        $response = $this->postJson(route('api.v1.login'), $data);
+        
+        // dd($response);
+        $response->assertStatus(422);
+        $response->assertJson([
+            'errors' => [
+                [
+                    'detail' => 'These credentials do not match our records.',
+                    'source' => [
+                        'pointer' => '/password'
+                    ]
+                ]
+            ]
+        ]);
     }
 }

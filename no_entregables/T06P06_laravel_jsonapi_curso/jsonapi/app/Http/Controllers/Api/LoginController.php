@@ -21,9 +21,9 @@ class LoginController extends Controller
             'device_name'=> 'required'
         ]);
         $user= User::whereEmail($request->email)->first();
-        if (!Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email'=> [__('auth.failed')]
+                'password' => [__('auth.failed')],
             ]);
         }
         // generamos el token
