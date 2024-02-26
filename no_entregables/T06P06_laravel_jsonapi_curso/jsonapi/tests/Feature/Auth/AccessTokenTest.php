@@ -53,9 +53,79 @@ class AccessTokenTest extends TestCase
 
         $response = $this->postJson(route('api.v1.login'), $data);
 
-        // dd($response);
         $response->assertStatus(422);
         $response->assertJsonValidationErrorFor('email');
+    }
+
+    /** @test */
+    public function user_must_be_registered(): void
+    {
+        $data = $this->validCredentials();
+
+        $response = $this->postJson(route('api.v1.login'), $data);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrorFor('email');
+    }
+
+    /** @test */
+    public function email_is_required(): void
+    {
+        $data = $this->validCredentials([
+            'email' => null,
+        ]);
+
+        $response = $this->postJson(route('api.v1.login'), $data);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([
+            'email' => 'required',
+        ]);
+    }
+
+    /** @test */
+    public function email_must_be_valid(): void
+    {
+        $data = $this->validCredentials([
+            'email' => 'invalid-email',
+        ]);
+
+        $response = $this->postJson(route('api.v1.login'), $data);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([
+            'email' => 'email',
+        ]);
+    }
+
+    /** @test */
+    public function password_is_required(): void
+    {
+        $data = $this->validCredentials([
+            'password' => null,
+        ]);
+
+        $response = $this->postJson(route('api.v1.login'), $data);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([
+            'password' => 'required',
+        ]);
+    }
+
+    /** @test */
+    public function device_name_is_required(): void
+    {
+        $data = $this->validCredentials([
+            'device_name' => null,
+        ]);
+
+        $response = $this->postJson(route('api.v1.login'), $data);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([
+            'device_name' => 'required',
+        ]);
     }
 
     protected function validCredentials(mixed $overrides = []): array
