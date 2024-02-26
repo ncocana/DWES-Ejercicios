@@ -14,18 +14,24 @@ class CreateArticleTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
+    /** @test */
+    public function guest_cannot_create_articles(): void
     {
-        parent::setUp();
+        $this->postJson(route('api.v1.articles.store'))
+            ->assertUnauthorized();
 
-        // Creating and authenticating a user
-        $user = User::factory()->create();
-        Sanctum::actingAs($user);
+        // $response->assertJsonApiError();
+        
+        $this->assertDatabaseCount('articles', 0);
     }
 
     /** @test */
     public function can_create_articles(): void
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $this->withoutExceptionHandling();
 
         $response = $this->postJson(route('api.v1.articles.store'), [
@@ -60,6 +66,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function title_is_required(): void
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+        
         $this->postJson(route('api.v1.articles.store'), [
             'slug' => 'nuevo-articulo',
             'content' => 'Contenido del artículo'
@@ -69,6 +79,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function title_must_be_at_least_4_characters(): void
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+        
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nue',
             'slug' => 'nuevo-articulo',
@@ -79,6 +93,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function slug_is_required(): void
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+        
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo Artículo',
             'content' => 'Contenido del artículo'
@@ -88,6 +106,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function slug_must_be_unique()
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+        
         $article= Article::factory()->create();
 
         // Probamos guardar un artículo con un 'slug' existente.
@@ -101,6 +123,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function slug_only_must_contain_numbers_letters_and_dashes()
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+        
         // Caracteres no permitidos.
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo artículo',
@@ -112,6 +138,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function slug_must_not_contain_underscores()
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+        
         // Guion bajo no está permitido.
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo artículo',
@@ -123,6 +153,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function slug_must_not_start_with_dashes()
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+        
         // Guion al principio no está permitido.
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo artículo',
@@ -134,6 +168,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function slug_must_not_end_with_dashes()
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+        
         // Guion al final no está permitido.
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo artículo',
@@ -145,6 +183,10 @@ class CreateArticleTest extends TestCase
     /** @test */
     public function content_is_required(): void
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+        
         $this->postJson(route('api.v1.articles.store'), [
             'title' => 'Nuevo Artículo',
             'slug' => 'nuevo-articulo',

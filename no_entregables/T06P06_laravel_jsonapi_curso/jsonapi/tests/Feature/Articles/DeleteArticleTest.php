@@ -13,18 +13,23 @@ class DeleteArticleTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
+    /** @test */
+    public function guest_cannot_delete_articles(): void
     {
-        parent::setUp();
+        $article= Article::factory()->create();
 
-        // Creating and authenticating a user
-        $user = User::factory()->create();
-        Sanctum::actingAs($user);
+        // Verifica el estado 204, No Content
+        $this->deleteJson(route('api.v1.articles.destroy', $article))
+            ->assertUnauthorized();
     }
     
     /** @test */
     public function can_delete_articles(): void
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $article= Article::factory()->create();
 
         // Verifica el estado 204, No Content

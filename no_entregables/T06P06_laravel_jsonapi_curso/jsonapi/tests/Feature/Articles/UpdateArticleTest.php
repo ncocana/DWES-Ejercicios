@@ -12,19 +12,25 @@ use Tests\TestCase;
 class UpdateArticleTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
+    
+    /** @test */
+    public function guest_cannot_update_articles(): void
     {
-        parent::setUp();
+        $article = Article::factory()->create();
 
-        // Creating and authenticating a user
-        $user = User::factory()->create();
-        Sanctum::actingAs($user);
+        $this->patchJson(route('api.v1.articles.update', $article))
+            ->assertUnauthorized();
+
+        // $response->assertJsonApiError();
     }
     
     /** @test */
     public function can_update_articles(): void
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $article = Article::factory()->create();
 
         $response = $this->patchJson(route('api.v1.articles.update', $article), [
@@ -56,6 +62,10 @@ class UpdateArticleTest extends TestCase
     
     public function title_is_required(): void
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $article = Article::factory()->create();
 
         $this->patchJson(route('api.v1.articles.update', $article), [
@@ -67,6 +77,10 @@ class UpdateArticleTest extends TestCase
     /** @test */
     public function title_must_be_at_least_4_characters(): void
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $article = Article::factory()->create();
 
         $this->patchJson(route('api.v1.articles.update', $article), [
@@ -79,6 +93,10 @@ class UpdateArticleTest extends TestCase
     /** @test */
     public function slug_is_required(): void
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $article = Article::factory()->create();
 
         $this->patchJson(route('api.v1.articles.update', $article), [
@@ -90,6 +108,10 @@ class UpdateArticleTest extends TestCase
     /** @test */
     public function slug_must_be_unique()
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $article1 = Article::factory()->create();
         $article2 = Article::factory()->create();
 
@@ -104,6 +126,10 @@ class UpdateArticleTest extends TestCase
     /** @test */
     public function slug_only_must_contain_numbers_letters_and_dashes()
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $article = Article::factory()->create();
 
         // Caracteres no permitidos.
@@ -117,6 +143,10 @@ class UpdateArticleTest extends TestCase
     /** @test */
     public function slug_must_not_contain_underscores()
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $article = Article::factory()->create();
 
         // Guion bajo no está permitido.
@@ -130,6 +160,10 @@ class UpdateArticleTest extends TestCase
     /** @test */
     public function slug_must_not_start_with_dashes()
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $article = Article::factory()->create();
 
         // Guion al principio no está permitido.
@@ -143,6 +177,10 @@ class UpdateArticleTest extends TestCase
     /** @test */
     public function slug_must_not_end_with_dashes()
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $article = Article::factory()->create();
 
         // Guion al final no está permitido.
@@ -156,6 +194,10 @@ class UpdateArticleTest extends TestCase
     /** @test */
     public function content_is_required(): void
     {
+        // Creating and authenticating a user
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
+
         $article = Article::factory()->create();
 
         $this->patchJson(route('api.v1.articles.update', $article), [
