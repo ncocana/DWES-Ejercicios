@@ -28,11 +28,9 @@ class AccessTokenTest extends TestCase
     {
         $this->withoutJsonApiDocumentFormatting();
 
-        $data = [
+        $data = $this->validCredentials([
             'email' => $this->user->email,
-            'password' => 'password',
-            'device_name' => 'My device',
-        ];
+        ]);
 
         $response = $this->postJson(route('api.v1.login'), $data);
 
@@ -48,26 +46,24 @@ class AccessTokenTest extends TestCase
     {
         $this->withoutJsonApiDocumentFormatting();
 
-        $data = [
+        $data = $this->validCredentials([
             'email' => $this->user->email,
             'password' => 'incorrect',
-            'device_name' => 'My device',
-        ];
+        ]);
 
         $response = $this->postJson(route('api.v1.login'), $data);
 
         // dd($response);
         $response->assertStatus(422);
-        // $response->assertJson([
-        //     'errors' => [
-        //         [
-        //             'detail' => 'These credentials do not match our records.',
-        //             'source' => [
-        //                 'pointer' => '/password'
-        //             ]
-        //         ]
-        //     ]
-        // ]);
-        $response->assertJsonApiValidationErrors('password');
+        $response->assertJsonValidationErrorFor('email');
+    }
+
+    protected function validCredentials(mixed $overrides = []): array
+    {
+        return array_merge([
+            'email' => 'ncocana@cifpfbmoll.eu',
+            'password' => 'password',
+            'device_name' => 'My device',
+        ], $overrides);
     }
 }

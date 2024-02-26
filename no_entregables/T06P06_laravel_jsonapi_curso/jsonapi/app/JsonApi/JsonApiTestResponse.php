@@ -23,7 +23,9 @@ class JsonApiTestResponse
                     'source' => ['pointer' => $pointer]
                 ]);
             } catch (ExpectationFailedException $e) {
-                $this->tryAlternativePointer($attribute);
+                PHPUnit::fail("Failed to find a JSON:API validation error for key: '{$attribute}'"
+                    . PHP_EOL . PHP_EOL .
+                    $e->getMessage());
             }
 
             try {

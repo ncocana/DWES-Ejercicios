@@ -20,14 +20,18 @@ class LoginController extends Controller
             'password'=> ['required'],
             'device_name'=> 'required'
         ]);
+
         $user= User::whereEmail($request->email)->first();
+
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'password' => [__('auth.failed')],
+                'email' => [__('auth.failed')],
             ]);
         }
-        // generamos el token
+
+        // Generamos el token
         $plainTextToken= $user->createToken($request->device_name)->plainTextToken;
+        
         return response()->json([
             'plain-text-token'=> $plainTextToken
         ]);
